@@ -5,6 +5,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Microsoft.VisualBasic;
 using ModbusRtuLib.Common;
 using ModbusRtuLib.Contracts;
 using ModbusRtuLib.Contracts.Ascii;
@@ -32,8 +33,17 @@ namespace ModbusRtuLib.Services.Ascii
 
             if (LRC.CheckLRC(resultString))
             {
-                var value = resultString[3];
-                return DataResult<bool>.OK(Convert.ToBoolean(value));
+                if (resultString[0] == 0x01)
+                {
+                    if (resultString.Length != 4)
+                    {
+                        return DataResult<bool>.OK(Convert.ToBoolean(resultString[3]));
+                    }
+                    else
+                    {
+                        return DataResult<bool>.NG($"错误代码：{resultString[2]}");
+                    }
+                }
             }
 
             return DataResult<bool>.NG("LRC 校验错误");
@@ -117,6 +127,68 @@ namespace ModbusRtuLib.Services.Ascii
             }
 
             return lrc;
+        }
+
+        public DataResult<bool> WriteSingleCoil(ushort start, bool value)
+        {
+            List<byte> writeByte = new();
+            writeByte.Add(0x3A);
+            writeByte.Add(this.Config.SlaveId);
+            writeByte.Add(0x05);
+            var bitStart = BitConverter.GetBytes(start);
+            Array.Reverse(bitStart);
+            writeByte.AddRange(bitStart);
+            byte lrc = 0x00;
+            if (value)
+            {
+                writeByte.Add(0xFF);
+                writeByte.Add(0x00);
+                lrc = LRC.LRCCalc(writeByte.ToArray(), 1, 6);
+            }
+            else
+            {
+                writeByte.Add(0x00);
+                writeByte.Add(0x00);
+                lrc = LRC.LRCCalc(writeByte.ToArray(), 1, 6);
+            }
+            writeByte.Add(lrc);
+            List<string> sendValue = new List<string>();
+            foreach (var item in writeByte)
+            {
+                if (item == 0x3A)
+                {
+                    sendValue.Add(":");
+                    continue;
+                }
+                sendValue.Add(item.ToString("X2"));
+            }
+            var strResult = string.Join("", sendValue);
+            var aa = Encoding.ASCII.GetBytes(strResult);
+            List<byte> finalBytes = new List<byte>(aa);
+            finalBytes.Add(0x0D);
+            finalBytes.Add(0x0A);
+            SerialPort.Write(finalBytes.ToArray(), 0, finalBytes.Count);
+            Thread.Sleep(Config.ReadTimeSpan);
+            var count = SerialPort.BytesToRead;
+            var resultByte = new byte[count];
+            SerialPort.Read(resultByte, 0, count);
+            var resultString = GetAsciiByte(Encoding.ASCII.GetString(resultByte));
+            if (LRC.CheckLRC(resultString))
+            {
+                //只判断功能码和站号了
+                if (resultString[1] == 0x05 && resultString[0] == Config.SlaveId)
+                {
+                    if (resultString.Length != 4)
+                    {
+                        return DataResult<bool>.OK(Convert.ToBoolean(true));
+                    }
+                    else
+                    {
+                        return DataResult<bool>.NG($"错误代码：{resultString[2]}");
+                    }
+                }
+            }
+            return DataResult<bool>.NG("LRC校验错误");
         }
     }
 }

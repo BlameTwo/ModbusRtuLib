@@ -35,5 +35,12 @@ IServiceProvider Service = new ServiceCollection()
             .SetupStart();
     })
     .BuildServiceProvider();
-var modbus = Service.GetService<IModbusAsciiClient>()!.GetSlave(1).ReadCoilSignle(0001);
+if (Service.GetService<IModbusAsciiClient>()!.GetSlave(1).WriteSingleCoil(0001, false).IsOK)
+{
+    var result = Service.GetService<IModbusAsciiClient>()!.GetSlave(1).ReadCoilSignle(0001);
+    if (result.IsOK)
+    {
+        Console.WriteLine(result.Data);
+    }
+}
 Console.ReadKey();
