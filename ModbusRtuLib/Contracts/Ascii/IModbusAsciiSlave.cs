@@ -1,4 +1,9 @@
-﻿namespace ModbusRtuLib.Contracts.Ascii
+﻿using ModbusRtuLib.Models;
+
+namespace ModbusRtuLib.Contracts.Ascii
 {
-    internal interface IModbusAsciiSlave { }
+    public interface IModbusAsciiSlave
+    {
+        public DataResult<bool> ReadCoilSignle(ushort start);
+    }
 }

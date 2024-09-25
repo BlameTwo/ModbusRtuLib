@@ -56,5 +56,20 @@ namespace ModbusRtuLib.Common
                 return 0;
             }
         }
+
+        public static bool CheckLRC(byte[] data)
+        {
+            if (data == null)
+                return false;
+            if (data.Length < 2)
+                return false;
+
+            var crc = LRCCalc(data, 0, data.Length - 1);
+            if (crc == data.Last())
+            {
+                return true;
+            }
+            return true;
+        }
     }
 }

@@ -22,6 +22,27 @@ namespace ModbusRtuLib.Services.Ascii
             slaves.Add(modbusRtuSlaveConfig.SlaveId, modbusRtuSlaveConfig);
         }
 
+        public IModbusAsciiSlave GetSlave(byte slaveId)
+        {
+            if (slaves.ContainsKey(slaveId))
+            {
+                if (slaves.TryGetValue(slaveId, out var config))
+                {
+                    return new ModbusAsciiSlave(Port, config) { };
+                }
+            }
+            return new ModbusAsciiSlave(
+                Port,
+                new ModbusRtuSlaveConfig()
+                {
+                    IsStartZero = true,
+                    SlaveId = slaveId,
+                    ReadTimeSpan = Config.ReadTimeSpan,
+                    WriteTimepan = Config.WriteTimeSpan,
+                }
+            );
+        }
+
         internal void Setup()
         {
             Port = new SerialPort();

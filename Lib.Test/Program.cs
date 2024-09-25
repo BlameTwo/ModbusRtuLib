@@ -30,10 +30,10 @@ IServiceProvider Service = new ServiceCollection()
                 p.IsStartZero = true;
                 p.IsCheckSlave = true;
                 p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.DCBA;
-                p.StringEncoding = Encoding.UTF8;
+                p.StringEncoding = Encoding.ASCII;
             })
             .SetupStart();
     })
     .BuildServiceProvider();
-var modbus = Service.GetService<IModbusAsciiClient>();
+var modbus = Service.GetService<IModbusAsciiClient>()!.GetSlave(1).ReadCoilSignle(0001);
 Console.ReadKey();

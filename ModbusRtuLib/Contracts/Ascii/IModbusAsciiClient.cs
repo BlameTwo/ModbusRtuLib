@@ -9,4 +9,6 @@ public interface IModbusAsciiClient
     SerialPortConfig Config { get; set; }
     public void AddSlave(ModbusRtuSlaveConfig modbusRtuSlaveConfig);
     bool IsConnected { get; }
+
+    public IModbusAsciiSlave GetSlave(byte slaveId);
 }
