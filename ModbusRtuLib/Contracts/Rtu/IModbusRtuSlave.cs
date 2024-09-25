@@ -70,14 +70,14 @@ namespace ModbusRtuLib.Contracts.Rtu
         public DataResult<long> ReadLong(ushort start);
 
         /// <summary>
-        /// 读取双精度浮点数，对应保持寄存器2个
+        /// 读取单精度浮点数，对应保持寄存器2个
         /// </summary>
         /// <param name="start"></param>
         /// <returns></returns>
         public DataResult<float> ReadFloat(ushort start);
 
         /// <summary>
-        /// 读取双精度浮点数，对应保持寄存器1个
+        /// 读取16位数字，对应保持寄存器1个
         /// </summary>
         /// <param name="start"></param>
         /// <returns></returns>

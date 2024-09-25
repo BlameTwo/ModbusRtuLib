@@ -26,4 +26,8 @@ public interface IByteConvert
     public byte[] BackInt16(byte[] bytes, DataFormat dataFormat);
 
     public byte[] BackDouble(byte[] bytes, DataFormat dataFormat);
+
+    public byte[] GetStart(ushort value);
+
+    public byte[] GetLength(ushort value);
 }

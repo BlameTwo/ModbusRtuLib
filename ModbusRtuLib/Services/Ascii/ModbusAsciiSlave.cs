@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO.Ports;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using Microsoft.VisualBasic;
+using System.Threading.Tasks;
 using ModbusRtuLib.Common;
 using ModbusRtuLib.Contracts;
 using ModbusRtuLib.Contracts.Ascii;
@@ -55,12 +54,9 @@ namespace ModbusRtuLib.Services.Ascii
             strings.Add(0x3A);
             strings.Add(this.Config.SlaveId);
             strings.Add(method);
-            var bitStart = BitConverter.GetBytes(start);
-            Array.Reverse(bitStart);
-            strings.AddRange(bitStart);
-            var bitlength = BitConverter.GetBytes(start);
-            Array.Reverse(bitlength);
-            strings.AddRange(bitlength);
+            strings.AddRange(ByteConvert.GetStart(start));
+
+            strings.AddRange(ByteConvert.GetLength(length));
             var lrc = LRC.LRCCalc(strings.ToArray(), 1, 6);
             strings.Add(lrc);
             List<string> sendValue = new List<string>();
@@ -87,6 +83,11 @@ namespace ModbusRtuLib.Services.Ascii
             return resultString;
         }
 
+        private Task<byte[]> ReadDataAsync(ushort start, byte method, ushort length)
+        {
+            return Task.Factory.StartNew(() => ReadData(start, method, length));
+        }
+
         byte[] GetAsciiByte(string orginText)
         {
             string dataPart = orginText.Substring(1).Replace("\r\n", "");
@@ -99,58 +100,20 @@ namespace ModbusRtuLib.Services.Ascii
             return bytesSequence;
         }
 
-        private static byte CalculateLrc(List<string> messageParts)
-        {
-            byte[] messageBytes = new byte[messageParts.Count * 2 - 1];
-
-            int index = 0;
-            foreach (string part in messageParts)
-            {
-                if (index == 0 || index == messageParts.Count - 1) // 忽略起始字符和终止字符
-                {
-                    index++;
-                    continue;
-                }
-
-                byte[] bytes = Enumerable
-                    .Range(0, part.Length / 2)
-                    .Select(x => Convert.ToByte(part.Substring(x * 2, 2), 16))
-                    .ToArray();
-                Array.Copy(bytes, 0, messageBytes, index, bytes.Length);
-                index += bytes.Length;
-            }
-
-            byte lrc = 0;
-            foreach (byte b in messageBytes)
-            {
-                lrc ^= b;
-            }
-
-            return lrc;
-        }
-
-        public DataResult<bool> WriteSingleCoil(ushort start, bool value)
+        public byte[] WriteData(byte method, ushort start, params byte[] bytes)
         {
             List<byte> writeByte = new();
             writeByte.Add(0x3A);
             writeByte.Add(this.Config.SlaveId);
-            writeByte.Add(0x05);
+            writeByte.Add(method);
             var bitStart = BitConverter.GetBytes(start);
             Array.Reverse(bitStart);
             writeByte.AddRange(bitStart);
-            byte lrc = 0x00;
-            if (value)
+            foreach (var item in bytes)
             {
-                writeByte.Add(0xFF);
-                writeByte.Add(0x00);
-                lrc = LRC.LRCCalc(writeByte.ToArray(), 1, 6);
+                writeByte.Add(item);
             }
-            else
-            {
-                writeByte.Add(0x00);
-                writeByte.Add(0x00);
-                lrc = LRC.LRCCalc(writeByte.ToArray(), 1, 6);
-            }
+            var lrc = LRC.LRCCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
             writeByte.Add(lrc);
             List<string> sendValue = new List<string>();
             foreach (var item in writeByte)
@@ -173,9 +136,38 @@ namespace ModbusRtuLib.Services.Ascii
             var resultByte = new byte[count];
             SerialPort.Read(resultByte, 0, count);
             var resultString = GetAsciiByte(Encoding.ASCII.GetString(resultByte));
+            return resultString;
+        }
+
+        public Task<byte[]> WriteDataAsync(byte method, ushort start, params byte[] bytes)
+        {
+            return Task.Factory.StartNew(() => WriteData(method, start, bytes));
+        }
+
+        public DataResult<bool> WriteSingleCoil(ushort start, bool value)
+        {
+            List<byte> writeByte = new();
+            writeByte.Add(0x3A);
+            writeByte.Add(this.Config.SlaveId);
+            writeByte.Add(0x05);
+            var bitStart = BitConverter.GetBytes(start);
+            Array.Reverse(bitStart);
+            writeByte.AddRange(bitStart);
+            byte[] resultString = null;
+            if (value)
+            {
+                writeByte.Add(0xFF);
+                writeByte.Add(0x00);
+                resultString = WriteData(0x05, start, 0xFF, 0x00);
+            }
+            else
+            {
+                writeByte.Add(0x00);
+                writeByte.Add(0x00);
+                resultString = WriteData(0x05, start, 0x00, 0x00);
+            }
             if (LRC.CheckLRC(resultString))
             {
-                //只判断功能码和站号了
                 if (resultString[1] == 0x05 && resultString[0] == Config.SlaveId)
                 {
                     if (resultString.Length != 4)
@@ -189,6 +181,103 @@ namespace ModbusRtuLib.Services.Ascii
                 }
             }
             return DataResult<bool>.NG("LRC校验错误");
+        }
+
+        public async Task<DataResult<bool>> WriteSingleCoilAsync(ushort start, bool value)
+        {
+            List<byte> writeByte = new();
+            writeByte.Add(0x3A);
+            writeByte.Add(this.Config.SlaveId);
+            writeByte.Add(0x05);
+            var bitStart = BitConverter.GetBytes(start);
+            Array.Reverse(bitStart);
+            writeByte.AddRange(bitStart);
+            byte[] resultString = null;
+            if (value)
+            {
+                writeByte.Add(0xFF);
+                writeByte.Add(0x00);
+                resultString = await WriteDataAsync(0x05, start, 0xFF, 0x00);
+            }
+            else
+            {
+                writeByte.Add(0x00);
+                writeByte.Add(0x00);
+                resultString = await WriteDataAsync(0x05, start, 0x00, 0x00);
+            }
+            if (LRC.CheckLRC(resultString))
+            {
+                if (resultString[1] == 0x05 && resultString[0] == Config.SlaveId)
+                {
+                    if (resultString.Length != 4)
+                    {
+                        return DataResult<bool>.OK(Convert.ToBoolean(true));
+                    }
+                    else
+                    {
+                        return DataResult<bool>.NG($"错误代码：{resultString[2]}");
+                    }
+                }
+            }
+            return DataResult<bool>.NG("LRC校验错误");
+        }
+
+        public async Task<DataResult<bool>> ReadCoilSingleAsync(ushort start)
+        {
+            var resultString = await ReadDataAsync(start, 0x01, start);
+
+            if (LRC.CheckLRC(resultString))
+            {
+                if (resultString[0] == 0x01)
+                {
+                    if (resultString.Length != 4)
+                    {
+                        return DataResult<bool>.OK(Convert.ToBoolean(resultString[3]));
+                    }
+                    else
+                    {
+                        return DataResult<bool>.NG($"错误代码：{resultString[2]}");
+                    }
+                }
+            }
+
+            return DataResult<bool>.NG("LRC 校验错误");
+        }
+
+        public DataResult<bool> ReadDiscrete(ushort start)
+        {
+            var resultString = ReadData(start, 0x02, start);
+            if (LRC.CheckLRC(resultString))
+            {
+                if (resultString.Length != 4)
+                {
+                    return DataResult<bool>.OK(Convert.ToBoolean(resultString[3]));
+                }
+                else
+                {
+                    return DataResult<bool>.NG($"错误代码：{resultString[2]}");
+                }
+            }
+
+            return DataResult<bool>.NG("LRC校验失败");
+        }
+
+        public async Task<DataResult<bool>> ReadiscreteAsync(ushort start)
+        {
+            var resultString = await ReadDataAsync(start, 0x02, start);
+            if (LRC.CheckLRC(resultString))
+            {
+                if (resultString.Length != 4)
+                {
+                    return DataResult<bool>.OK(Convert.ToBoolean(resultString[3]));
+                }
+                else
+                {
+                    return DataResult<bool>.NG($"错误代码：{resultString[2]}");
+                }
+            }
+
+            return DataResult<bool>.NG("LRC校验失败");
         }
     }
 }

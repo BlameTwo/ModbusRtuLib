@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ModbusRtuLib.Contracts;
 using ModbusRtuLib.Models.Enums;
 
-namespace ModbusRtuLib.Common;
+namespace ModbusRtuLib.Services;
 
 /// <summary>
 /// 字节序转换
@@ -119,7 +119,7 @@ public sealed class ByteConvert : IByteConvert
     {
         //补全偶数，只是为了凑够一个字（2byte）
         byte[] length =
-            (byteValues.Length % 2 == 0)
+            byteValues.Length % 2 == 0
                 ? new byte[byteValues.Length]
                 : new byte[byteValues.Length + 1];
         Array.Copy(byteValues, 0, length, 0, byteValues.Length);
@@ -214,5 +214,18 @@ public sealed class ByteConvert : IByteConvert
             bytesResult.AddRange(ToWord(bytes, dataFormat));
         }
         return bytesResult.ToArray();
+    }
+
+    public byte[] GetStart(ushort value)
+    {
+        var start = new byte[2];
+        start[0] = (byte)(value / 256);
+        start[1] = (byte)(value % 256);
+        return start;
+    }
+
+    public byte[] GetLength(ushort value)
+    {
+        return GetStart(value);
     }
 }
