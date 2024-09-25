@@ -29,12 +29,11 @@ IServiceProvider Service = new ServiceCollection()
                 p.SlaveId = 1;
                 p.IsStartZero = true;
                 p.IsCheckSlave = true;
-                p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.DCBA;
+                p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.ABCD;
                 p.StringEncoding = Encoding.ASCII;
             })
             .SetupStart();
     })
     .BuildServiceProvider();
-
-var result = Service.GetService<IModbusAsciiClient>()!.GetSlave(1).ReadDiscrete(0x0001);
+var f = Service.GetService<IModbusAsciiClient>()!.GetSlave(1).ReadInt32(0x0001);
 Console.ReadKey();

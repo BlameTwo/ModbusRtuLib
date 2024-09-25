@@ -1,4 +1,5 @@
-﻿using ModbusRtuLib.Models.Enums;
+﻿using System.Collections.Generic;
+using ModbusRtuLib.Models.Enums;
 
 namespace ModbusRtuLib.Contracts;
 
@@ -13,6 +14,8 @@ public interface IByteConvert
 
     public byte[] ToLong(long[] values, DataFormat dataFormat);
 
+    public byte[] ToInt32(int[] ints, DataFormat dataFormat);
+
     public byte[] ToDouble(double[] values, DataFormat dataFormat);
 
     public byte[] ToWord(byte[] byteValues, DataFormat dataFormat);
@@ -24,6 +27,7 @@ public interface IByteConvert
     public byte[] BackFloat(byte[] bytes, DataFormat dataFormat);
 
     public byte[] BackInt16(byte[] bytes, DataFormat dataFormat);
+    public byte[] BackInt32(byte[] bytes, DataFormat dataFormat);
 
     public byte[] BackDouble(byte[] bytes, DataFormat dataFormat);
 

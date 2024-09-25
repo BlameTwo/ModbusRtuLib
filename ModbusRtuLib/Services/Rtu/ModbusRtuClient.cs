@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO.Ports;
+using System.Text;
 using ModbusRtuLib.Contracts.Rtu;
 using ModbusRtuLib.Models;
 
@@ -50,6 +51,9 @@ namespace ModbusRtuLib.Services.Rtu
                     SlaveId = slaveId,
                     ReadTimeSpan = Config.ReadTimeSpan,
                     WriteTimepan = Config.WriteTimeSpan,
+                    DataFormat = Models.Enums.DataFormat.CDAB,
+                    IsCheckSlave = true,
+                    StringEncoding = Encoding.ASCII,
                 }
             );
         }

@@ -189,7 +189,7 @@ public sealed class ByteConvert : IByteConvert
     public byte[] BackFloat(byte[] bytes, DataFormat dataFormat)
     {
         List<byte> byteResult = new List<byte>();
-        for (int i = 0; i < bytes.Length; i++)
+        for (int i = 0; i < bytes.Length; i += 2)
         {
             byteResult.AddRange(ToWord(bytes, dataFormat));
         }
@@ -202,6 +202,24 @@ public sealed class ByteConvert : IByteConvert
         for (int i = 0; i < bytes.Length; i++)
         {
             bytesResult.AddRange(ToWord(bytes, dataFormat));
+        }
+        return bytesResult.ToArray();
+    }
+
+    public byte[] BackInt32(byte[] bytes, DataFormat dataFormat)
+    {
+        List<byte> bytesResult = new List<byte>();
+        bytesResult.AddRange(ToWord(bytes, dataFormat));
+        return bytesResult.ToArray();
+    }
+
+    public byte[] ToInt32(int[] ints, DataFormat dataFormat)
+    {
+        List<byte> bytesResult = new List<byte>();
+        for (int i = 0; i < ints.Length; i++)
+        {
+            var byteValues = BitConverter.GetBytes(ints[i]);
+            bytesResult.AddRange(ToWord(byteValues, dataFormat));
         }
         return bytesResult.ToArray();
     }

@@ -264,12 +264,12 @@ namespace ModbusRtuLib.Services.Rtu
             return DataResult<float>.OK(result2);
         }
 
-        public DataResult<float> ReadInt16(ushort start)
+        public DataResult<short> ReadInt16(ushort start)
         {
             var result = ReadHoldingRegister(Config.SlaveId, start, 1);
-            var l = ByteConvert.BackFloat(result, Config.DataFormat);
+            var l = ByteConvert.BackInt16(result, Config.DataFormat);
             var result2 = BitConverter.ToInt16(l, 0);
-            return DataResult<float>.OK(result2);
+            return DataResult<short>.OK(result2);
         }
 
         public DataResult<double> ReadDouble(ushort start)

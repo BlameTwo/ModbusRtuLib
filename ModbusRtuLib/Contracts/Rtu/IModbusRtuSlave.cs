@@ -81,7 +81,7 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// </summary>
         /// <param name="start"></param>
         /// <returns></returns>
-        public DataResult<float> ReadInt16(ushort start);
+        public DataResult<short> ReadInt16(ushort start);
 
         /// <summary>
         /// 读取双精度浮点数，对应保持寄存器4个
