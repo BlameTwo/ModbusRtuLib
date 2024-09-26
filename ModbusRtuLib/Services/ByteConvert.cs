@@ -99,12 +99,28 @@ public sealed class ByteConvert : IByteConvert
         }
         else if (byteValues.Length == 8)
         {
-            byte[] end = new byte[4];
-            Array.Copy(byteValues, 4, end, 0, 4);
-            byteResult.AddRange(ToWord(end, dataFormat));
-            byte[] start = new byte[4];
-            Array.Copy(byteValues, 0, start, 0, 4);
-            byteResult.AddRange(ToWord(start, dataFormat));
+            if (
+                dataFormat == DataFormat.ABCD
+                || dataFormat == DataFormat.BADC
+                || dataFormat == DataFormat.DCBA
+            )
+            {
+                byte[] end = new byte[4];
+                Array.Copy(byteValues, 4, end, 0, 4);
+                byteResult.AddRange(ToWord(end, dataFormat));
+                byte[] start = new byte[4];
+                Array.Copy(byteValues, 0, start, 0, 4);
+                byteResult.AddRange(ToWord(start, dataFormat));
+            }
+            if (dataFormat == DataFormat.CDAB)
+            {
+                byte[] start = new byte[4];
+                Array.Copy(byteValues, 0, start, 0, 4);
+                byteResult.AddRange(ToWord(start, dataFormat));
+                byte[] end = new byte[4];
+                Array.Copy(byteValues, 4, end, 0, 4);
+                byteResult.AddRange(ToWord(end, dataFormat));
+            }
         }
         return byteResult.ToArray();
     }

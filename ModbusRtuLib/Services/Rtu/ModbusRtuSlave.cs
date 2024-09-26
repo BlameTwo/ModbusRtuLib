@@ -318,5 +318,32 @@ namespace ModbusRtuLib.Services.Rtu
             var str = Config.StringEncoding.GetString(l);
             return DataResult<string>.OK(str);
         }
+
+        public DataResult<bool> WriteInt32(ushort start, int value)
+        {
+            var byteValue = BitConverter.GetBytes(value);
+            List<byte> data = new List<byte>();
+            data.Add(Config.SlaveId);
+            data.Add(0x10);
+            data.AddRange(ByteConvert.GetStart(start));
+            data.AddRange(ByteConvert.GetLength(0x0002));
+            data.Add(4);
+            data.AddRange(ByteConvert.ToInt32([value], Config.DataFormat));
+            byte[] crc = CRC.Crc16(data.ToArray(), 11);
+            data.AddRange(crc);
+            SerialPort.Write(data.ToArray(), 0, data.Count);
+            Thread.Sleep(200);
+            var count = SerialPort.BytesToRead;
+            var resultByte = new byte[count];
+            return DataResult<bool>.OK(true);
+        }
+
+        public DataResult<int> ReadInt32(ushort start)
+        {
+            var bytes = this.ReadHoldingRegister(this.Config.SlaveId, start, 0002);
+            var floatByte = ByteConvert.BackInt32(bytes, Config.DataFormat);
+            var f = BitConverter.ToInt32(floatByte, 0);
+            return DataResult<int>.OK(f);
+        }
     }
 }

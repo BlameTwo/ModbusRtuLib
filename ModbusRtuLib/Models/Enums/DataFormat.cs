@@ -25,4 +25,12 @@
         /// </summary>
         DCBA,
     }
+
+    public enum DoubleFormat
+    {
+        ABCDEFGH,
+        GHEFCDAB,
+        BADCFEHG,
+        HGFEDCBA,
+    }
 }

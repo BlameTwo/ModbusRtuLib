@@ -83,6 +83,10 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         public DataResult<short> ReadInt16(ushort start);
 
+        public DataResult<bool> WriteInt32(ushort start, int value);
+
+        public DataResult<int> ReadInt32(ushort start);
+
         /// <summary>
         /// 读取双精度浮点数，对应保持寄存器4个
         /// </summary>

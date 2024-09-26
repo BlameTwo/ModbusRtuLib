@@ -21,9 +21,19 @@ public class ModbusRtuSlaveConfig
     public DataFormat DataFormat { get; set; } = DataFormat.CDAB;
 
     /// <summary>
+    /// Float字节排列
+    /// </summary>
+    public DoubleFormat DoubleFormat { get; set; } = DoubleFormat.GHEFCDAB;
+
+    /// <summary>
     /// 字符串编码格式
     /// </summary>
     public Encoding StringEncoding { get; set; }
+
+    /// <summary>
+    /// 是否颠倒字符串
+    /// </summary>
+    public bool ReverseString { get; set; }
 
     /// <summary>
     /// 站号

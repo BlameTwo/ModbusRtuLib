@@ -5,21 +5,21 @@ using ModbusRtuLib.Contracts.Ascii;
 using ModbusRtuLib.Contracts.Rtu;
 
 IServiceProvider Service = new ServiceCollection()
-    .AddSingleton(p =>
-    {
-        return ModBusFactory
-            .CreateDefaultRtuClient("COM6")
-            .AddSlave(p =>
-            {
-                p.SlaveId = 1;
-                p.IsStartZero = true;
-                p.IsCheckSlave = true;
-                p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.DCBA;
-                p.StringEncoding = Encoding.UTF8;
-            })
-            .SetupStart();
-        ;
-    })
+    //.AddSingleton(p =>
+    //{
+    //    return ModBusFactory
+    //        .CreateDefaultRtuClient("COM2")
+    //        .AddSlave(p =>
+    //        {
+    //            p.SlaveId = 1;
+    //            p.IsStartZero = true;
+    //            p.IsCheckSlave = true;
+    //            p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.CDAB;
+    //            p.StringEncoding = Encoding.UTF8;
+    //        })
+    //        .SetupStart();
+    //    ;
+    //})
     .AddSingleton(p =>
     {
         return ModBusFactory
@@ -29,11 +29,16 @@ IServiceProvider Service = new ServiceCollection()
                 p.SlaveId = 1;
                 p.IsStartZero = true;
                 p.IsCheckSlave = true;
-                p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.ABCD;
+                p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.DCBA;
                 p.StringEncoding = Encoding.ASCII;
+                p.ReverseString = false;
             })
             .SetupStart();
     })
     .BuildServiceProvider();
-var f = Service.GetService<IModbusAsciiClient>()!.GetSlave(1).ReadInt32(0x0001);
+var result3 = Service
+    .GetService<IModbusAsciiClient>()!
+    .GetSlave(1)
+    .WriteDouble(0x0001, 121.123423d);
+
 Console.ReadKey();
