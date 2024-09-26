@@ -3,7 +3,7 @@ using ModbusRtuLib.Models.Enums;
 
 namespace ModbusRtuLib.Models;
 
-public class ModbusRtuSlaveConfig
+public class ModbusSlaveConfig
 {
     /// <summary>
     /// 是否从0开始,纯使用modbus不用管，默认为true
@@ -19,11 +19,6 @@ public class ModbusRtuSlaveConfig
     /// 字节序排列模式
     /// </summary>
     public DataFormat DataFormat { get; set; } = DataFormat.CDAB;
-
-    /// <summary>
-    /// Float字节排列
-    /// </summary>
-    public DoubleFormat DoubleFormat { get; set; } = DoubleFormat.GHEFCDAB;
 
     /// <summary>
     /// 字符串编码格式

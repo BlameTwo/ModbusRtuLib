@@ -13,9 +13,9 @@ namespace ModbusRtuLib.Services.Ascii
 
         public bool IsConnected => Port.IsOpen;
 
-        readonly Dictionary<int, ModbusRtuSlaveConfig> slaves = new();
+        readonly Dictionary<int, ModbusSlaveConfig> slaves = new();
 
-        public void AddSlave(ModbusRtuSlaveConfig modbusRtuSlaveConfig)
+        public void AddSlave(ModbusSlaveConfig modbusRtuSlaveConfig)
         {
             if (slaves.ContainsKey(modbusRtuSlaveConfig.SlaveId))
                 return;
@@ -33,7 +33,7 @@ namespace ModbusRtuLib.Services.Ascii
             }
             return new ModbusAsciiSlave(
                 Port,
-                new ModbusRtuSlaveConfig()
+                new ModbusSlaveConfig()
                 {
                     IsStartZero = true,
                     SlaveId = slaveId,

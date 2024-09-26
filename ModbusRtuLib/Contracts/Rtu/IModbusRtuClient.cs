@@ -10,7 +10,7 @@ namespace ModbusRtuLib.Contracts.Rtu
 
         bool IsConnected { get; }
 
-        void AddSlave(ModbusRtuSlaveConfig modbusRtuSlaveConfig);
+        void AddSlave(ModbusSlaveConfig modbusRtuSlaveConfig);
 
         /// <summary>
         /// 根据注册站号或传入站号创建一个从站信息，传入站号时内部不存储站号信息

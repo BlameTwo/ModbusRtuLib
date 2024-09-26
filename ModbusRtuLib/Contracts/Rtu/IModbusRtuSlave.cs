@@ -4,7 +4,7 @@ namespace ModbusRtuLib.Contracts.Rtu
 {
     public interface IModbusRtuSlave
     {
-        public ModbusRtuSlaveConfig Config { get; }
+        public ModbusSlaveConfig Config { get; }
 
         /// <summary>
         /// 读取单个线圈

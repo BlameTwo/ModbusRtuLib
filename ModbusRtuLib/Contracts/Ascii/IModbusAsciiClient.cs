@@ -7,7 +7,7 @@ public interface IModbusAsciiClient
     System.IO.Ports.SerialPort Port { get; set; }
 
     SerialPortConfig Config { get; set; }
-    public void AddSlave(ModbusRtuSlaveConfig modbusRtuSlaveConfig);
+    public void AddSlave(ModbusSlaveConfig modbusRtuSlaveConfig);
     bool IsConnected { get; }
 
     public IModbusAsciiSlave GetSlave(byte slaveId);

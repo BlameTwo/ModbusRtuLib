@@ -84,10 +84,10 @@ namespace ModbusRtuLib.Common
         /// <returns></returns>
         public static IModbusRtuClient AddSlave(
             this IModbusRtuClient slave,
-            Action<ModbusRtuSlaveConfig> config
+            Action<ModbusSlaveConfig> config
         )
         {
-            var ModbusRtuSlaveConfig = new ModbusRtuSlaveConfig();
+            var ModbusRtuSlaveConfig = new ModbusSlaveConfig();
             config(ModbusRtuSlaveConfig);
             slave.AddSlave(ModbusRtuSlaveConfig);
             return slave;
@@ -101,10 +101,10 @@ namespace ModbusRtuLib.Common
         /// <returns></returns>
         public static IModbusAsciiClient AddSlave(
             this IModbusAsciiClient slave,
-            Action<ModbusRtuSlaveConfig> config
+            Action<ModbusSlaveConfig> config
         )
         {
-            var ModbusRtuSlaveConfig = new ModbusRtuSlaveConfig();
+            var ModbusRtuSlaveConfig = new ModbusSlaveConfig();
             config(ModbusRtuSlaveConfig);
             slave.AddSlave(ModbusRtuSlaveConfig);
             return slave;
