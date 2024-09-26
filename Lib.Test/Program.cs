@@ -39,6 +39,6 @@ IServiceProvider Service = new ServiceCollection()
 var result3 = Service
     .GetService<IModbusAsciiClient>()!
     .GetSlave(1)
-    .WriteDouble(0x0001, 121.123423d);
+    .WriteDouble(0x0001, 2000.3434243d);
 
 Console.ReadKey();

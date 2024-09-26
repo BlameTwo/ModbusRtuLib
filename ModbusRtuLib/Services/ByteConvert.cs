@@ -17,20 +17,20 @@ public sealed class ByteConvert : IByteConvert
         for (int i = 0; i < values.Length; i++)
         {
             var byteValues = BitConverter.GetBytes(values[i]);
-            byteResult.AddRange(ToWord(byteValues, dataFormat));
+            byteResult.AddRange(AdjustByteOrder(byteValues, dataFormat));
         }
         return byteResult.ToArray();
     }
 
     public byte[] ToInt16(short[] values, DataFormat dataFormat)
     {
-        List<byte> bytesResult = new List<byte>();
+        List<byte> byteResult = new List<byte>();
         for (int i = 0; i < values.Length; i++)
         {
             var byteValues = BitConverter.GetBytes(values[i]);
-            bytesResult.AddRange(ToWord(byteValues, dataFormat));
+            byteResult.AddRange(ToWord(byteValues, dataFormat));
         }
-        return bytesResult.ToArray();
+        return byteResult.ToArray();
     }
 
     public byte[] ToDouble(double[] values, DataFormat dataFormat)
@@ -39,7 +39,8 @@ public sealed class ByteConvert : IByteConvert
         for (int i = 0; i < values.Length; i++)
         {
             var byteValues = BitConverter.GetBytes(values[i]);
-            bytesResult.AddRange(ToWord(byteValues, dataFormat));
+            var bytes = AdjustByteOrder(byteValues, dataFormat);
+            bytesResult.AddRange(bytes);
         }
         return bytesResult.ToArray();
     }
@@ -81,21 +82,7 @@ public sealed class ByteConvert : IByteConvert
         }
         else if (byteValues.Length == 2)
         {
-            switch (dataFormat)
-            {
-                case DataFormat.ABCD:
-                    byteResult.AddRange([byteValues[1], byteValues[0]]);
-                    break;
-                case DataFormat.CDAB:
-                    byteResult.AddRange([byteValues[1], byteValues[0]]);
-                    break;
-                case DataFormat.BADC:
-                    byteResult.AddRange([byteValues[0], byteValues[1]]);
-                    break;
-                case DataFormat.DCBA:
-                    byteResult.AddRange([byteValues[0], byteValues[1]]);
-                    break;
-            }
+            byteResult.AddRange([byteValues[1], byteValues[0]]);
         }
         else if (byteValues.Length == 8)
         {
@@ -169,7 +156,7 @@ public sealed class ByteConvert : IByteConvert
         for (int i = 0; i < values.Length; i++)
         {
             var byteValues = BitConverter.GetBytes(values[i]);
-            bytesResult.AddRange(ToWord(byteValues, dataFormat));
+            bytesResult.AddRange(AdjustByteOrder(byteValues, dataFormat));
         }
         return bytesResult.ToArray();
     }
@@ -187,28 +174,13 @@ public sealed class ByteConvert : IByteConvert
 
     public byte[] BackLong(byte[] bytes, DataFormat dataFormat)
     {
-        List<byte> byteResult = new List<byte>();
-        for (int i = 0; i < bytes.Length; i += 8)
-        {
-            var world = new byte[8];
-            Array.Copy(bytes, i, world, 0, 8);
-            var start = new byte[4];
-            var end = new byte[4];
-            Array.Copy(world, 0, start, 0, 4);
-            Array.Copy(world, 4, end, 0, 4);
-            byteResult.AddRange(BackWord(end, dataFormat));
-            byteResult.AddRange(BackWord(start, dataFormat));
-        }
+        List<byte> byteResult = [.. ReverseByteOrder(bytes, dataFormat)];
         return byteResult.ToArray();
     }
 
     public byte[] BackFloat(byte[] bytes, DataFormat dataFormat)
     {
-        List<byte> byteResult = new List<byte>();
-        for (int i = 0; i < bytes.Length; i += 2)
-        {
-            byteResult.AddRange(ToWord(bytes, dataFormat));
-        }
+        List<byte> byteResult = [.. ReverseByteOrder(bytes, dataFormat)];
         return byteResult.ToArray();
     }
 
@@ -225,7 +197,10 @@ public sealed class ByteConvert : IByteConvert
     public byte[] BackInt32(byte[] bytes, DataFormat dataFormat)
     {
         List<byte> bytesResult = new List<byte>();
-        bytesResult.AddRange(ToWord(bytes, dataFormat));
+        for (int i = 0; i < bytes.Length; i += 2)
+        {
+            bytesResult.AddRange(ToWord(bytes, dataFormat));
+        }
         return bytesResult.ToArray();
     }
 
@@ -235,19 +210,16 @@ public sealed class ByteConvert : IByteConvert
         for (int i = 0; i < ints.Length; i++)
         {
             var byteValues = BitConverter.GetBytes(ints[i]);
-            bytesResult.AddRange(ToWord(byteValues, dataFormat));
+            var bytes = ToWord(byteValues, dataFormat);
+            bytesResult.AddRange(bytes);
         }
         return bytesResult.ToArray();
     }
 
     public byte[] BackDouble(byte[] bytes, DataFormat dataFormat)
     {
-        List<byte> bytesResult = new List<byte>();
-        for (int i = 0; i < bytes.Length; i++)
-        {
-            bytesResult.AddRange(ToWord(bytes, dataFormat));
-        }
-        return bytesResult.ToArray();
+        List<byte> byteResult = [.. ReverseByteOrder(bytes, dataFormat)];
+        return byteResult.ToArray();
     }
 
     public byte[] GetStart(ushort value)
@@ -261,5 +233,133 @@ public sealed class ByteConvert : IByteConvert
     public byte[] GetLength(ushort value)
     {
         return GetStart(value);
+    }
+
+    public static byte[] AdjustByteOrder(byte[] input, DataFormat format)
+    {
+        if (input == null || input.Length == 0)
+        {
+            throw new ArgumentException("输入数据不能为空");
+        }
+
+        int length = input.Length;
+        List<byte> bytesResult = new List<byte>();
+
+        switch (format)
+        {
+            case DataFormat.ABCD:
+                Array.Reverse(input);
+                bytesResult.AddRange(input);
+                break;
+
+            case DataFormat.CDAB:
+                for (int i = 0; i < length; i += 2)
+                {
+                    if (i + 1 < length)
+                    {
+                        bytesResult.Add(input[i + 1]);
+                        bytesResult.Add(input[i]);
+                    }
+                    else
+                    {
+                        bytesResult.Add(input[i]);
+                    }
+                }
+                break;
+
+            case DataFormat.BADC:
+                for (int i = 0; i < length; i += 8)
+                {
+                    if (i + 7 < length)
+                    {
+                        bytesResult.Add(input[i + 6]);
+                        bytesResult.Add(input[i + 7]);
+                        bytesResult.Add(input[i + 4]);
+                        bytesResult.Add(input[i + 5]);
+                        bytesResult.Add(input[i + 2]);
+                        bytesResult.Add(input[i + 3]);
+                        bytesResult.Add(input[i]);
+                        bytesResult.Add(input[i + 1]);
+                    }
+                    else
+                    {
+                        for (int j = i; j < length; j++)
+                        {
+                            bytesResult.Add(input[j]);
+                        }
+                    }
+                }
+                break;
+
+            case DataFormat.DCBA:
+                bytesResult.AddRange(input);
+                break;
+        }
+
+        return bytesResult.ToArray();
+    }
+
+    public static byte[] ReverseByteOrder(byte[] input, DataFormat format)
+    {
+        if (input == null || input.Length == 0)
+        {
+            throw new ArgumentException("输入数据不能为空");
+        }
+
+        int length = input.Length;
+        List<byte> bytesResult = new List<byte>();
+
+        switch (format)
+        {
+            case DataFormat.ABCD:
+                Array.Reverse(input);
+                bytesResult.AddRange(input);
+                break;
+
+            case DataFormat.CDAB:
+                for (int i = 0; i < length; i += 2)
+                {
+                    if (i + 1 < length)
+                    {
+                        bytesResult.Add(input[i + 1]);
+                        bytesResult.Add(input[i]);
+                    }
+                    else
+                    {
+                        bytesResult.Add(input[i]);
+                    }
+                }
+                break;
+
+            case DataFormat.BADC:
+                for (int i = 0; i < length; i += 8)
+                {
+                    if (i + 7 < length)
+                    {
+                        bytesResult.Add(input[i + 6]);
+                        bytesResult.Add(input[i + 7]);
+                        bytesResult.Add(input[i + 4]);
+                        bytesResult.Add(input[i + 5]);
+                        bytesResult.Add(input[i + 2]);
+                        bytesResult.Add(input[i + 3]);
+                        bytesResult.Add(input[i]);
+                        bytesResult.Add(input[i + 1]);
+                    }
+                    else
+                    {
+                        for (int j = i; j < length; j++)
+                        {
+                            bytesResult.Add(input[j]);
+                        }
+                    }
+                }
+                break;
+
+            case DataFormat.DCBA:
+                bytesResult.AddRange(input);
+                break;
+        }
+
+        return bytesResult.ToArray();
     }
 }
