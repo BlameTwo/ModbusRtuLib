@@ -19,10 +19,28 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         IModbusRtuSlave GetSlave(byte slaveId);
 
+        /// <summary>
+        /// 读取保持寄存器
+        /// </summary>
+        /// <param name="slaveId"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
         public DataResult<ushort> ReadHoldingRegisterSingle(byte slaveId, ushort start);
 
+        /// <summary>
+        /// 读取线圈
+        /// </summary>
+        /// <param name="slaveId"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
         public DataResult<bool> ReadCoilSingle(byte slaveId, ushort start);
 
+        /// <summary>
+        /// 读取输入寄存器
+        /// </summary>
+        /// <param name="slaveId"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
         public DataResult<bool> ReadDiscreteSingle(byte slaveId, ushort start);
     }
 }

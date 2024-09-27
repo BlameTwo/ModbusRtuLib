@@ -9,7 +9,7 @@ namespace ModbusRtuLib.Services;
 /// <summary>
 /// 字节序转换
 /// </summary>
-public sealed class ByteConvert : IByteConvert
+public sealed partial class ByteConvert : IByteConvert
 {
     public byte[] ToFloat(float[] values, DataFormat dataFormat)
     {
@@ -222,7 +222,7 @@ public sealed class ByteConvert : IByteConvert
         return byteResult.ToArray();
     }
 
-    public byte[] GetStart(ushort value)
+    public byte[] GetStartBytes(ushort value)
     {
         var start = new byte[2];
         start[0] = (byte)(value / 256);
@@ -232,7 +232,7 @@ public sealed class ByteConvert : IByteConvert
 
     public byte[] GetLength(ushort value)
     {
-        return GetStart(value);
+        return GetStartBytes(value);
     }
 
     public static byte[] AdjustByteOrder(byte[] input, DataFormat format)

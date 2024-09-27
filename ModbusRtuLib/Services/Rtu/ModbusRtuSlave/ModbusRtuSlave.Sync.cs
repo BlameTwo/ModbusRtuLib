@@ -307,7 +307,7 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
         data.Add(0x10);
-        data.AddRange(ByteConvert.GetStart(start));
+        data.AddRange(ByteConvert.GetStartBytes(start));
         data.AddRange(ByteConvert.GetLength(0x0002));
         data.Add(4);
         data.AddRange(ByteConvert.ToInt32([value], Config.DataFormat));

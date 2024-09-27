@@ -187,7 +187,7 @@ partial class ModbusAsciiSlave
         strings.Add(0x3A);
         strings.Add(this.Config.SlaveId);
         strings.Add(method);
-        strings.AddRange(ByteConvert.GetStart(start));
+        strings.AddRange(ByteConvert.GetStartBytes(start));
         strings.AddRange(ByteConvert.GetLength(length));
         var lrc = LRC.LRCCalc(strings.ToArray(), 1, 6);
         strings.Add(lrc);
@@ -286,7 +286,7 @@ partial class ModbusAsciiSlave
         writeByte.Add(0x3A);
         writeByte.Add(this.Config.SlaveId);
         writeByte.Add(method);
-        writeByte.AddRange(ByteConvert.GetStart(start));
+        writeByte.AddRange(ByteConvert.GetStartBytes(start));
         foreach (var item in bytes)
         {
             writeByte.Add(item);
@@ -323,7 +323,7 @@ partial class ModbusAsciiSlave
         writeByte.Add(0x3A);
         writeByte.Add(this.Config.SlaveId);
         writeByte.Add(0x10);
-        writeByte.AddRange(ByteConvert.GetStart(start));
+        writeByte.AddRange(ByteConvert.GetStartBytes(start));
         writeByte.AddRange(ByteConvert.GetLength((ushort)(data.Length / 2)));
         writeByte.Add((byte)data.Length);
         writeByte.AddRange(data);

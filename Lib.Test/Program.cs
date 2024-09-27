@@ -1,44 +1,59 @@
-﻿using System.Text;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using ModbusRtuLib.Common;
-using ModbusRtuLib.Contracts.Ascii;
-using ModbusRtuLib.Contracts.Rtu;
+using ModbusRtuLib.Common.Factorys;
+using ModbusRtuLib.Contracts.Tcp;
 
-IServiceProvider Service = new ServiceCollection()
-    .AddSingleton(p =>
+internal class Program
+{
+    private static void Main(string[] args)
     {
-        return ModBusFactory
-            .CreateDefaultRtuClient("COM2")
-            .AddSlave(p =>
+        IServiceProvider Service = new ServiceCollection()
+            .AddSingleton(p =>
             {
-                p.SlaveId = 1;
-                p.IsStartZero = true;
-                p.IsCheckSlave = true;
-                p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.CDAB;
-                p.StringEncoding = Encoding.UTF8;
+                return DeviceFactory
+                    .CreateDefaultTcpClient()
+                    .InitServerPort(p =>
+                    {
+                        p.IpAddress = "127.0.0.1";
+                        p.Port = 502;
+                        p.IsReconnect = false;
+                    });
             })
-            .SetupStart();
-        ;
-    })
-    //.AddSingleton(p =>
-    //{
-    //    return ModBusFactory
-    //        .CreateDefaultAsciiClient("COM2")
-    //        .AddSlave(p =>
-    //        {
-    //            p.SlaveId = 1;
-    //            p.IsStartZero = true;
-    //            p.IsCheckSlave = true;
-    //            p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.DCBA;
-    //            p.StringEncoding = Encoding.ASCII;
-    //            p.ReverseString = false;
-    //        })
-    //        .SetupStart();
-    //})
-    .BuildServiceProvider();
-var result3 = Service
-    .GetService<IModbusRtuClient>()!
-    .GetSlave(1)
-    .WriteDouble(0x0001, 2000.3434243d);
-
-Console.ReadKey();
+            //.AddSingleton(p =>
+            //{
+            //    return DeviceFactory
+            //        .CreateDefaultRtuClient("COM2")
+            //        .AddSlave(p =>
+            //        {
+            //            p.SlaveId = 1;
+            //            p.IsStartZero = true;
+            //            p.IsCheckSlave = true;
+            //            p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.CDAB;
+            //            p.StringEncoding = Encoding.UTF8;
+            //        })
+            //        .SetupStart();
+            //    ;
+            //})
+            //.AddSingleton(p =>
+            //{
+            //    return DeviceFactory
+            //        .CreateDefaultAsciiClient("COM2")
+            //        .AddSlave(p =>
+            //        {
+            //            p.SlaveId = 1;
+            //            p.IsStartZero = true;
+            //            p.IsCheckSlave = true;
+            //            p.DataFormat = ModbusRtuLib.Models.Enums.DataFormat.DCBA;
+            //            p.StringEncoding = Encoding.ASCII;
+            //            p.ReverseString = false;
+            //        })
+            //        .SetupStart();
+            //})
+            .BuildServiceProvider();
+        var client = Service.GetService<IModbusTcpClient>()!;
+        if ((client.Connect("127.0.0.1").Data))
+        {
+            var result = client.GetSlave(1).ReadCoil(0x0000);
+        }
+    }
+}

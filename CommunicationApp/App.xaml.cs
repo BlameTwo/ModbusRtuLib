@@ -1,50 +1,82 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Microsoft.UI.Xaml;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace CommunicationApp;
 
-namespace CommunicationApp
+public partial class App : Application
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
-    public partial class App : Application
+    public App()
     {
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
-        public App()
-        {
-            this.InitializeComponent();
-        }
-
-        /// <summary>
-        /// Invoked when the application is launched.
-        /// </summary>
-        /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
-        {
-            m_window = new MainWindow();
-            m_window.Activate();
-        }
-
-        private Window m_window;
+        this.InitializeComponent();
+        this.UnhandledException += App_UnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
     }
+
+    private void CurrentDomain_FirstChanceException(
+        object sender,
+        System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e
+    )
+    {
+        if (!File.Exists("D:\\Log.txt"))
+        {
+            var fs = File.CreateText("D:\\Log.txt");
+            fs.WriteLine(e.Exception.Message);
+        }
+        else
+        {
+            using (StreamWriter sw = new StreamWriter("D:\\Log.txt"))
+            {
+                sw.WriteLine(e.Exception.Message);
+            }
+        }
+    }
+
+    private void CurrentDomain_UnhandledException(
+        object sender,
+        System.UnhandledExceptionEventArgs e
+    )
+    {
+        if (!File.Exists("D:\\Log.txt"))
+        {
+            var fs = File.CreateText("D:\\Log.txt");
+            fs.WriteLine((e.ExceptionObject as Exception).Message);
+        }
+        else
+        {
+            using (StreamWriter sw = new StreamWriter("D:\\Log.txt"))
+            {
+                sw.WriteLine((e.ExceptionObject as Exception).Message);
+            }
+        }
+    }
+
+    private void App_UnhandledException(
+        object sender,
+        Microsoft.UI.Xaml.UnhandledExceptionEventArgs e
+    )
+    {
+        if (!File.Exists("D:\\Log.txt"))
+        {
+            var fs = File.CreateText("D:\\Log.txt");
+            fs.WriteLine(e.Message + e.Exception.Message);
+        }
+        else
+        {
+            using (StreamWriter sw = new StreamWriter("D:\\Log.txt"))
+            {
+                sw.WriteLine(e.Message + e.Exception.Message);
+            }
+        }
+        e.Handled = true;
+    }
+
+    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    {
+        m_window = new Window();
+        m_window.Activate();
+    }
+
+    private Window m_window;
 }

@@ -31,7 +31,9 @@ public interface IByteConvert
 
     public byte[] BackDouble(byte[] bytes, DataFormat dataFormat);
 
-    public byte[] GetStart(ushort value);
+    public byte[] GetStartBytes(ushort value);
 
     public byte[] GetLength(ushort value);
+
+    public ushort GetStart(params byte[] data);
 }

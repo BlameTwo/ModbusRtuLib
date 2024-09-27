@@ -4,6 +4,7 @@ using System.Text;
 using ModbusRtuLib.Contracts;
 using ModbusRtuLib.Contracts.Ascii;
 using ModbusRtuLib.Contracts.Rtu;
+using ModbusRtuLib.Contracts.Tcp;
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Enums;
 using ModbusRtuLib.Services.Ascii;
@@ -30,6 +31,17 @@ namespace ModbusRtuLib.Common
         )
         {
             var SerialPortConfig = new SerialPortConfig();
+            p(SerialPortConfig);
+            client.Config = SerialPortConfig;
+            return client;
+        }
+
+        public static IModbusTcpClient InitServerPort(
+            this IModbusTcpClient client,
+            Action<ServerPortConfig> p
+        )
+        {
+            var SerialPortConfig = new ServerPortConfig("127.0.0.1");
             p(SerialPortConfig);
             client.Config = SerialPortConfig;
             return client;

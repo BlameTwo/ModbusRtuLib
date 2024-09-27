@@ -83,8 +83,19 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         public DataResult<short> ReadInt16(ushort start);
 
+        /// <summary>
+        /// 写入Int32
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public DataResult<bool> WriteInt32(ushort start, int value);
 
+        /// <summary>
+        /// 读取Int32
+        /// </summary>
+        /// <param name="start"></param>
+        /// <returns></returns>
         public DataResult<int> ReadInt32(ushort start);
 
         /// <summary>
