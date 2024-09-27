@@ -21,6 +21,8 @@ public partial class ModbusTcpSlave
         bytes.AddRange(ByteConvert.GetStartBytes(Convert.ToUInt16(be.Count)));
         bytes.AddRange(be);
         var result = Device.SendData(bytes.ToArray());
+        if (result.Item2 == 0)
+            return DataResult<bool>.NG("未读取到任何数据！");
         if (ByteConvert.GetStart(result.Item1[0], result.Item1[1]) == 0x0002)
         {
             var getLength = ByteConvert.GetStart(result.Item1[4], result.Item1[5]);

@@ -11,7 +11,6 @@ namespace ModbusRtuLib.Contracts
     {
         public DataResult<bool> Connect(string ip, int port = 502);
 
-        public Task<DataResult<bool>> ConnectAsync(string ip, int port = 502);
         public bool IsReconnect { get; }
 
         public bool IsConnected { get; }

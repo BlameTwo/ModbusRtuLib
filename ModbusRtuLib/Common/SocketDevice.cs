@@ -18,6 +18,7 @@ public class SocketDevice : ISocketDevice
 
     public bool IsConnected { get; private set; }
     private CancellationTokenSource _cancellationTokenSource;
+    private bool isConnecting;
 
     public SocketDevice(bool isReconnect)
     {
@@ -29,7 +30,10 @@ public class SocketDevice : ISocketDevice
         try
         {
             if (TcpClient != null)
-                TcpClient.Dispose();
+            {
+                TcpClient.Close();
+                TcpClient = null;
+            }
             this.IP = ip;
             this.Port = port;
             TcpClient = new TcpClient();
@@ -40,8 +44,9 @@ public class SocketDevice : ISocketDevice
         }
         catch (Exception ex)
         {
+            TcpClient.Close();
+            TcpClient.Dispose();
             Console.WriteLine("连接失败: " + ex.Message);
-            StartReconnect();
             return DataResult<bool>.OK(TcpClient.Connected);
         }
     }
@@ -63,36 +68,8 @@ public class SocketDevice : ISocketDevice
         catch (Exception ex)
         {
             Console.WriteLine("连接失败: " + ex.Message);
-            StartReconnect();
             return DataResult<bool>.OK(TcpClient.Connected);
         }
-    }
-
-    private void StartReconnect()
-    {
-        IsConnected = false;
-        Console.WriteLine("尝试重连...");
-        Timer timer = null;
-        timer = new Timer(
-            async _ =>
-            {
-                if (!IsConnected)
-                {
-                    try
-                    {
-                        await ConnectAsync(IP, Port);
-                        timer?.Dispose();
-                    }
-                    catch
-                    {
-                        Console.WriteLine("重连失败，继续尝试...");
-                    }
-                }
-            },
-            null,
-            TimeSpan.Zero,
-            TimeSpan.FromSeconds(5)
-        );
     }
 
     private void StartListening()
@@ -104,25 +81,33 @@ public class SocketDevice : ISocketDevice
             {
                 while (true)
                 {
-                    Thread.Sleep(100);
+                    await Task.Delay(2000);
                     try
                     {
-                        if (
-                            TcpClient.Client.Poll(0, SelectMode.SelectRead)
-                            && TcpClient.Available == 0
-                        )
+                        if (IsConnected == false)
                         {
-                            Console.WriteLine("连接已断开");
-                            IsConnected = false;
                             if (IsReconnect)
-                                StartReconnect();
+                            {
+                                isConnecting = true;
+                                IsConnected = false;
+                                Console.WriteLine("尝试重连...");
+                                TcpClient = new TcpClient();
+                                await TcpClient.ConnectAsync(IP, Port);
+                                IsConnected = TcpClient.Connected;
+                            }
                         }
                     }
                     catch (Exception)
                     {
-                        IsConnected = false;
                         if (IsReconnect)
-                            StartReconnect();
+                        {
+                            isConnecting = true;
+                            IsConnected = false;
+                            Console.WriteLine("尝试重连...");
+                            TcpClient = new TcpClient();
+                            await TcpClient.ConnectAsync(IP, Port);
+                            IsConnected = TcpClient.Connected;
+                        }
                     }
                 }
             },
@@ -132,22 +117,26 @@ public class SocketDevice : ISocketDevice
 
     public void SendData(string message)
     {
-        if (IsConnected)
+        try
         {
+            if (this.IsConnected == false)
+                return;
             byte[] data = Encoding.ASCII.GetBytes(message);
             NetworkStream stream = TcpClient.GetStream();
             stream.Write(data, 0, data.Length);
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("未连接，无法发送数据");
+            this.IsConnected = false;
         }
     }
 
     public (byte[], int) SendData(byte[] message)
     {
-        if (IsConnected)
+        try
         {
+            if (IsConnected == false)
+                return (null, 0);
             NetworkStream stream = TcpClient.GetStream();
             stream.Write(message, 0, message.Length);
             Thread.Sleep(200);
@@ -157,8 +146,9 @@ public class SocketDevice : ISocketDevice
             Array.Copy(buffer, 0, resultByte, 0, bytesRead);
             return (resultByte, bytesRead);
         }
-        else
+        catch (Exception)
         {
+            this.IsConnected = false;
             return (null, 0);
         }
     }
