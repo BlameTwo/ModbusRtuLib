@@ -27,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="MainWindow.xaml" />
+    <None Remove="Styles\TitleBar.xaml" />
     <None Remove="Views\ShellPage.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\ShellPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Styles\TitleBar.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

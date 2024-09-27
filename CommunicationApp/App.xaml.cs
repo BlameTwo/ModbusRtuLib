@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using CommunicationApp.Views;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 
 namespace CommunicationApp;
 
@@ -75,6 +77,13 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         m_window = new Window();
+        var page = new ShellPage();
+        page.titleBar.Window = m_window;
+        m_window.Content = page;
+        m_window.SystemBackdrop = new MicaBackdrop()
+        {
+            Kind = Microsoft.UI.Composition.SystemBackdrops.MicaKind.Base,
+        };
         m_window.Activate();
     }
 
