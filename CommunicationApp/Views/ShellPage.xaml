@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:CommunicationApp.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:property="using:CommunicationApp.Controls.Propertys"
     xmlns:ui="using:CommunicationApp.Controls"
     mc:Ignorable="d">
 
@@ -48,37 +49,19 @@
             IsSettingsVisible="False">
             <NavigationView.MenuItems>
                 <NavigationViewItemHeader Content="Modbus" />
-                <NavigationViewItem Content="串口">
+                <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.ModbusViewModels.ModbusSerialPortViewModel" Content="SerialPort">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="FluentSystemIcons-Filled" Glyph="&#xEB7B;" />
                     </NavigationViewItem.Icon>
-                    <NavigationViewItem.MenuItems>
-                        <NavigationViewItem Content="RTU">
-                            <NavigationViewItem.Icon>
-                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE770;" />
-                            </NavigationViewItem.Icon>
-                        </NavigationViewItem>
-
-                        <NavigationViewItem Content="Ascii">
-                            <NavigationViewItem.Icon>
-                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE775;" />
-                            </NavigationViewItem.Icon>
-                        </NavigationViewItem>
-                    </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
                 <NavigationViewItem Content="Tcp">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC05;" />
                     </NavigationViewItem.Icon>
-                    <NavigationViewItem.MenuItems>
-                        <NavigationViewItem Content="Modbus-Tcp">
-                            <NavigationViewItem.Icon>
-                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE968;" />
-                            </NavigationViewItem.Icon>
-                        </NavigationViewItem>
-                    </NavigationViewItem.MenuItems>
+
                 </NavigationViewItem>
             </NavigationView.MenuItems>
+            <Frame x:Name="frame" />
         </NavigationView>
     </Grid>
 </Page>

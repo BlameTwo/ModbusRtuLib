@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CommunicationApp.Views;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
@@ -10,7 +11,9 @@ public partial class App : Application
 {
     public App()
     {
+        ProgramLife.InitService();
         this.InitializeComponent();
+
         this.UnhandledException += App_UnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
@@ -77,7 +80,7 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         m_window = new Window();
-        var page = new ShellPage();
+        var page = ProgramLife.ServiceProvider.GetService<ShellPage>();
         page.titleBar.Window = m_window;
         m_window.Content = page;
         m_window.SystemBackdrop = new MicaBackdrop()
