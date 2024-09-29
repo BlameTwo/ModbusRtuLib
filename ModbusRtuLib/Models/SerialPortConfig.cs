@@ -23,7 +23,7 @@ namespace ModbusRtuLib.Models
         public DataFormat DataFormat { get; set; }
 
         public byte DefaultSlaveDevice { get; set; } = 1;
-        public int ReadTimeSpan { get; internal set; }
-        public int WriteTimeSpan { get; internal set; }
+        public int ReadTimeSpan { get; set; }
+        public int WriteTimeSpan { get; set; }
     }
 }

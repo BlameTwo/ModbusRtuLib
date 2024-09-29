@@ -3,6 +3,7 @@ using System.IO.Ports;
 using System.Text;
 using ModbusRtuLib.Contracts.Rtu;
 using ModbusRtuLib.Models;
+using ModbusRtuLib.Models.Handlers;
 
 namespace ModbusRtuLib.Services.Rtu
 {
@@ -15,6 +16,23 @@ namespace ModbusRtuLib.Services.Rtu
 
         readonly Dictionary<int, ModbusSlaveConfig> slaves = new();
 
+        public event ModbusDataReceived DataRecived
+        {
+            add => dataRevicedHandler += value;
+            remove => dataRevicedHandler -= value;
+        }
+        public event ModbusConnectChanged ConnectChanged
+        {
+            add => connecthandler += value;
+            remove => connecthandler -= value;
+        }
+
+        private ModbusDataReceived dataRevicedHandler;
+
+        private ModbusConnectChanged connecthandler;
+
+        private bool disposedValue;
+
         public void AddSlave(ModbusSlaveConfig modbusRtuSlaveConfig)
         {
             if (slaves.ContainsKey(modbusRtuSlaveConfig.SlaveId))
@@ -24,6 +42,10 @@ namespace ModbusRtuLib.Services.Rtu
 
         internal void Setup()
         {
+            if (Port != null)
+            {
+                Port.DataReceived -= Port_DataReceived;
+            }
             Port = new SerialPort();
             Port.BaudRate = Config.BaudRate;
             Port.DataBits = Config.DataBit;
@@ -31,7 +53,17 @@ namespace ModbusRtuLib.Services.Rtu
             Port.PortName = Config.SerialPortName;
             Port.Parity = Config.Parity;
             Port.Handshake = Config.Handshake;
+            Port.DataReceived += Port_DataReceived;
             Port.Open();
+            this.connecthandler?.Invoke(this, Port.IsOpen);
+        }
+
+        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            this.dataRevicedHandler?.Invoke(
+                this,
+                new ModbusDataModel() { Type = Models.Enums.ModbusMessageDataType.Bytes }
+            );
         }
 
         public IModbusRtuSlave GetSlave(byte slaveId)
@@ -74,6 +106,39 @@ namespace ModbusRtuLib.Services.Rtu
         {
             var slave = GetSlave(slaveId);
             return slave.ReadDiscreteSingle(start);
+        }
+
+        public void Close()
+        {
+            this.Port.Close();
+            this.connecthandler?.Invoke(this, Port.IsOpen);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    this.Port.Close();
+                    this.Port.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~ModbusRtuClient()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            System.GC.SuppressFinalize(this);
         }
     }
 }

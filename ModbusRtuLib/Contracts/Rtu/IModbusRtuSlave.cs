@@ -1,4 +1,5 @@
-﻿using ModbusRtuLib.Models;
+﻿using System.Threading.Tasks;
+using ModbusRtuLib.Models;
 
 namespace ModbusRtuLib.Contracts.Rtu
 {
@@ -12,6 +13,8 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="start"></param>
         /// <returns></returns>
         public DataResult<bool> ReadCoilSingle(ushort start);
+
+        public Task<DataResult<bool>> ReadCoilSingleAsync(ushort start);
 
         /// <summary>
         /// 读取单个保持寄存器

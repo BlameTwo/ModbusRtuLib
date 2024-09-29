@@ -33,6 +33,7 @@ namespace CommunicationApp
                 #region Viwe And ViewModel
                 .AddTransient<ShellPage>()
                 .AddTransient<ShellViewModel>()
+                .AddTransient<HomeViewModel>()
                 .AddTransient<ModbusSerialPortViewModel>()
                 #endregion
                 .BuildServiceProvider();

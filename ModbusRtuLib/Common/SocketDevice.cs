@@ -40,14 +40,14 @@ public class SocketDevice : ISocketDevice
             TcpClient.Connect(ip, port);
             IsConnected = TcpClient.Connected;
             StartListening();
-            return DataResult<bool>.OK(TcpClient.Connected);
+            return DataResult<bool>.OK(TcpClient.Connected, null, null);
         }
         catch (Exception ex)
         {
             TcpClient.Close();
             TcpClient.Dispose();
             Console.WriteLine("连接失败: " + ex.Message);
-            return DataResult<bool>.OK(TcpClient.Connected);
+            return DataResult<bool>.OK(TcpClient.Connected, null, null);
         }
     }
 
@@ -63,12 +63,12 @@ public class SocketDevice : ISocketDevice
             await TcpClient.ConnectAsync(IP, Port);
             IsConnected = true;
             StartListening();
-            return DataResult<bool>.OK(TcpClient.Connected);
+            return DataResult<bool>.OK(TcpClient.Connected, null, null);
         }
         catch (Exception ex)
         {
             Console.WriteLine("连接失败: " + ex.Message);
-            return DataResult<bool>.OK(TcpClient.Connected);
+            return DataResult<bool>.OK(TcpClient.Connected, null, null);
         }
     }
 

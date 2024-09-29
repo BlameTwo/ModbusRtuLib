@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:CommunicationApp.Views.ModbusView"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:CommunicationApp.Models"
     Margin="15"
     mc:Ignorable="d">
 
@@ -17,89 +18,261 @@
         </Grid.ChildrenTransitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid
             Padding="20"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             CornerRadius="5">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ComboBox
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    FontSize="12"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.Ports, Mode=OneWay}"
+                    PlaceholderText="SerialPort"
+                    SelectedItem="{x:Bind ViewModel.SelectPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox
+                    Grid.Column="1"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    FontSize="12"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.Contracts, Mode=OneWay}"
+                    PlaceholderText="Agreement"
+                    SelectedItem="{x:Bind ViewModel.SelectContract, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <NumberBox
+                    Grid.Column="2"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    Maximum="100000"
+                    Minimum="1"
+                    SmallChange="1"
+                    Value="{x:Bind ViewModel.BaudRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox
+                    Grid.Column="3"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    FontSize="12"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.StopBits, Mode=OneWay}"
+                    PlaceholderText="Stop Bit"
+                    SelectedItem="{x:Bind ViewModel.SelectStopBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ComboBox
+                    Margin="0,10,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Stretch"
+                    FontSize="12"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.DataBit, Mode=OneWay}"
+                    PlaceholderText="Data Bit"
+                    SelectedItem="{x:Bind ViewModel.SelectBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox
+                    Grid.Column="1"
+                    Margin="5,10,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Stretch"
+                    FontSize="12"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.Paritys, Mode=OneWay}"
+                    PlaceholderText="Parity"
+                    SelectedItem="{x:Bind ViewModel.SelectParity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox
+                    Grid.Column="2"
+                    Margin="5,10,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Stretch"
+                    FontSize="12"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    ItemsSource="{x:Bind ViewModel.DataFormats, Mode=OneWay}"
+                    PlaceholderText="DataFormat"
+                    SelectedItem="{x:Bind ViewModel.SelectFormat, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox
+                    Grid.Column="3"
+                    Margin="5,10,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Stretch"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    PlaceholderText="字符编码">
+                    <ComboBoxItem Content="UTF8" />
+                    <ComboBoxItem Content="Ascii" />
+                    <ComboBoxItem Content="Unicode" />
+                    <ComboBoxItem Content="UTF16" />
+                </ComboBox>
+            </Grid>
+            <StackPanel
+                Grid.RowSpan="2"
+                Grid.Column="1"
+                Orientation="Horizontal">
+                <Border
+                    Grid.Column="1"
+                    Width="2"
+                    Height="50"
+                    Margin="15,0,0,0"
+                    HorizontalAlignment="Center"
+                    Background="{ThemeResource ComboBoxFocusedBackgroundThemeBrush}"
+                    CornerRadius="5"
+                    Opacity="0.5" />
+                <Button
+                    Grid.Column="2"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Command="{x:Bind ViewModel.BuildStartCommand}"
+                    IsEnabled="{x:Bind ViewModel.EnableStart, Mode=OneWay}"
+                    Style="{ThemeResource TransparentButtonStyle}">
+                    <FontIcon
+                        FontFamily="Segoe Fluent Icons"
+                        FontSize="12"
+                        Glyph="&#xF5B0;" />
+                </Button>
+                <Button
+                    Grid.Column="3"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Command="{x:Bind ViewModel.StopPortCommand}"
+                    Style="{ThemeResource TransparentButtonStyle}">
+                    <FontIcon
+                        FontFamily="Segoe Fluent Icons"
+                        FontSize="12"
+                        Glyph="&#xEE95;" />
+                </Button>
+                <Border
+                    Grid.Column="4"
+                    Width="2"
+                    Height="50"
+                    Margin="15,0,0,0"
+                    HorizontalAlignment="Center"
+                    Background="{ThemeResource ComboBoxFocusedBackgroundThemeBrush}"
+                    CornerRadius="5"
+                    Opacity="0.5" />
+                <Rectangle
+                    Width="20"
+                    Height="20"
+                    Margin="10,0,0,0"
+                    Fill="{x:Bind ViewModel.ConnectStatus, Mode=OneWay}"
+                    RadiusX="20"
+                    RadiusY="20" />
+            </StackPanel>
+        </Grid>
+        <Grid
+            Grid.Row="1"
+            Margin="0,10,0,0"
+            Padding="10"
+            Background="{ThemeResource CardBackgroundFillColorDefault}"
+            CornerRadius="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <StackPanel Orientation="Horizontal">
-                <ComboBox
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    FontSize="12"
-                    ItemsSource="{x:Bind ViewModel.Ports, Mode=OneWay}"
-                    PlaceholderText="端口号" />
-                <ComboBox
-                    Margin="5,0,0,0"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    FontSize="12"
-                    ItemsSource="{x:Bind ViewModel.Contracts, Mode=OneWay}"
-                    PlaceholderText="协议" />
-                <ComboBox
-                    Margin="5,0,0,0"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    FontSize="12"
-                    PlaceholderText="停止位" />
-                <ComboBox
-                    Margin="5,0,0,0"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    FontSize="12"
-                    PlaceholderText="数据位" />
-                <ComboBox
-                    Margin="5,0,0,0"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    FontSize="12"
-                    PlaceholderText="奇偶校验" />
-                <ComboBox
-                    Margin="5,0,0,0"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    FontSize="12"
-                    PlaceholderText="DataFormat" />
-            </StackPanel>
-            <Border
+            <TextBox PlaceholderText="Start" Text="{x:Bind ViewModel.StartPostion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox
                 Grid.Column="1"
-                Width="1"
                 Margin="5,0,0,0"
-                Background="{ThemeResource SystemColorGrayTextBrush}" />
-            <Button
+                PlaceholderText="Station" />
+            <DropDownButton
                 Grid.Column="2"
                 Margin="5,0,0,0"
-                Style="{ThemeResource TransparentButtonStyle}">
-                <FontIcon
-                    FontFamily="Segoe Fluent Icons"
-                    FontSize="12"
-                    Glyph="&#xF5B0;" />
-            </Button>
-            <Button
+                Content="Read">
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadSingileCoilCommand}" Text="Coil Regsiter" />
+                        <MenuFlyoutItem Text="Discrete Regsiter" />
+                        <MenuFlyoutItem Text="Holding Regsiter" />
+                        <MenuFlyoutItem Text="Input Regsiter" />
+                        <MenuFlyoutSubItem Text="Data">
+                            <MenuFlyoutItem Text="Int16" />
+                            <MenuFlyoutItem Text="Int32" />
+                            <MenuFlyoutItem Text="Float" />
+                            <MenuFlyoutItem Text="Double" />
+                            <MenuFlyoutItem Text="Int64" />
+                        </MenuFlyoutSubItem>
+                    </MenuFlyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+            <DropDownButton
                 Grid.Column="3"
                 Margin="5,0,0,0"
-                Style="{ThemeResource TransparentButtonStyle}">
-                <FontIcon
-                    FontFamily="Segoe Fluent Icons"
-                    FontSize="12"
-                    Glyph="&#xEE95;" />
-            </Button>
-            <Border
-                Grid.Column="4"
-                Width="1"
-                Margin="5,0,0,0"
-                Background="{ThemeResource SystemColorGrayTextBrush}" />
+                Content="Write">
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Text="Coil Regsiter" />
+                        <MenuFlyoutItem Text="Holding Regsiter" />
+                        <MenuFlyoutSubItem Text="Data">
+                            <MenuFlyoutItem Text="Int16" />
+                            <MenuFlyoutItem Text="Int32" />
+                            <MenuFlyoutItem Text="Float" />
+                            <MenuFlyoutItem Text="Double" />
+                            <MenuFlyoutItem Text="Int64" />
+                        </MenuFlyoutSubItem>
+                    </MenuFlyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
         </Grid>
-        <ItemsPresenter Grid.Row="1" />
+        <ListView
+            Grid.Row="2"
+            Margin="0,5,0,0"
+            ItemsSource="{x:Bind ViewModel.ModbusMessages, Mode=OneWay}">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="model:ModbusMessage">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{x:Bind Type}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="20,0,0,0"
+                            Text="{x:Bind Value}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            Text="{x:Bind Time}" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Page>

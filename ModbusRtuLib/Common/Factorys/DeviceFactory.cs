@@ -18,11 +18,10 @@ public static class DeviceFactory
     /// 默认串口
     /// </summary>
     /// <returns></returns>
-    public static IModbusRtuClient CreateDefaultRtuClient(string COMName)
+    public static IModbusRtuClient CreateDefaultRtuClient()
     {
         return new ModbusRtuClient().InitSerialPort(p =>
         {
-            p.SerialPortName = COMName;
             p.BaudRate = 9600;
             p.DataBit = 8;
             p.StopBit = System.IO.Ports.StopBits.One;

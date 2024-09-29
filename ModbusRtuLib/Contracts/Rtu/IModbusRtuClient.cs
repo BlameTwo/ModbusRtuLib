@@ -2,7 +2,7 @@
 
 namespace ModbusRtuLib.Contracts.Rtu
 {
-    public interface IModbusRtuClient
+    public interface IModbusRtuClient : IModbusClient
     {
         System.IO.Ports.SerialPort Port { get; set; }
 
@@ -42,5 +42,7 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="start"></param>
         /// <returns></returns>
         public DataResult<bool> ReadDiscreteSingle(byte slaveId, ushort start);
+
+        public void Close();
     }
 }

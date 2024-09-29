@@ -6,11 +6,21 @@ public class DataResult<T>
 
     public bool IsOK { get; set; }
 
+    public byte[] OrginSend { get; set; }
+
+    public byte[] ReceivedData { get; set; }
+
     public string Error { get; set; }
 
-    public static DataResult<T> OK(T data)
+    public static DataResult<T> OK(T data, byte[] orginSend = null, byte[] receivedData = null)
     {
-        return new DataResult<T>() { Data = data, IsOK = true };
+        return new DataResult<T>()
+        {
+            Data = data,
+            IsOK = true,
+            OrginSend = orginSend,
+            ReceivedData = receivedData,
+        };
     }
 
     public static DataResult<T> NG(string message)

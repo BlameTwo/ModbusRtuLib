@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using CommunicationApp.ViewModels;
 using CommunicationApp.ViewModels.ModbusViewModels;
+using CommunicationApp.Views;
 using CommunicationApp.Views.ModbusView;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
@@ -15,6 +17,7 @@ public sealed partial class PageService : IPageService
     {
         _pages = new();
         this.RegisterView<ModbusSerialPortViewPage, ModbusSerialPortViewModel>();
+        this.RegisterView<HomePage, HomeViewModel>();
     }
 
     public Type GetPage(string key)

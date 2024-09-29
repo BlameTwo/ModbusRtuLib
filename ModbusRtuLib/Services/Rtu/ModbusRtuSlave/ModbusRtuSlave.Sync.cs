@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO.Ports;
 using System.Threading;
+using System.Threading.Tasks;
 using ModbusRtuLib.Common;
 using ModbusRtuLib.Contracts.Rtu;
 using ModbusRtuLib.Models;
@@ -18,11 +20,20 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         }
 
         var single = ReadCoil(Config.SlaveId, start, 0001);
-        if (single.Length == 1)
+        if (single.Item2.Length == 1)
         {
-            return DataResult<bool>.OK(Convert.ToBoolean(single[0]));
+            return DataResult<bool>.OK(
+                Convert.ToBoolean(single.Item2[0]),
+                single.Item1,
+                single.Item2
+            );
         }
         return DataResult<bool>.NG("写入错误！");
+    }
+
+    public async Task<DataResult<bool>> ReadCoilSingleAsync(ushort start)
+    {
+        return await Task.Factory.StartNew(() => ReadCoilSingle(start));
     }
 
     public DataResult<ushort> ReadHoldingRegisterSingle(ushort start)
@@ -60,35 +71,35 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
     {
         var value = ReadData(id, 0x03, start, length);
         byte[] result = new byte[length * 2];
-        Array.Copy(value, 3, result, 0, length * 2);
+        Array.Copy(value.Item2, 3, result, 0, length * 2);
         return result;
     }
 
-    byte[] ReadCoil(byte id, ushort start, ushort length)
+    (byte[], byte[]) ReadCoil(byte id, ushort start, ushort length)
     {
         var value = ReadData(id, 0x01, start, length);
-        if (value != null)
+        if (value.Item2 != null)
         {
             byte[] result = new byte[length];
-            Array.Copy(value, 3, result, 0, length);
-            return result;
+            Array.Copy(value.Item2, 3, result, 0, length);
+            return new(value.Item1, result);
         }
-        return new byte[length];
+        return new(null, null);
     }
 
     byte[] ReadDiscrete(byte id, ushort start, ushort length)
     {
         var value = ReadData(id, 0x02, start, length);
-        if (value != null)
+        if (value.Item2 != null)
         {
             byte[] result = new byte[length];
-            Array.Copy(value, 3, result, 0, length);
+            Array.Copy(value.Item2, 3, result, 0, length);
             return result;
         }
         return new byte[length];
     }
 
-    byte[] ReadData(byte id, byte method, ushort start, ushort length)
+    (byte[], byte[]) ReadData(byte id, byte method, ushort start, ushort length)
     {
         if (!Config.IsStartZero)
         {
@@ -97,10 +108,8 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         List<byte> data = new List<byte>();
         data.Add(id);
         data.Add(method);
-        data.Add((byte)(start / 256));
-        data.Add((byte)(start % 256));
-        data.Add((byte)(length / 256));
-        data.Add((byte)(length % 256));
+        data.AddRange(ByteConvert.GetStartBytes(start));
+        data.AddRange(ByteConvert.GetStartBytes(length));
         byte[] crc = CRC.Crc16(data.ToArray(), 6);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
@@ -111,9 +120,9 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         var a = CRC.CheckCRC(resultByte, method, id, Config.IsCheckSlave);
         if (a)
         {
-            return resultByte;
+            return new(data.ToArray(), resultByte);
         }
-        return null;
+        return (null, null);
     }
 
     /// <summary>
