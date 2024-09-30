@@ -23,12 +23,16 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         public DataResult<ushort> ReadHoldingRegisterSingle(ushort start);
 
+        public Task<DataResult<ushort>> ReadHoldingRegisterSingleAsync(ushort start);
+
         /// <summary>
         /// 读取单个离散寄存器
         /// </summary>
         /// <param name="start"></param>
         /// <returns></returns>
         public DataResult<bool> ReadDiscreteSingle(ushort start);
+
+        public Task<DataResult<bool>> ReadDiscreteSingleAsync(ushort start);
 
         /// <summary>
         /// 写入单个线圈
@@ -37,7 +41,9 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="start"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool WriteCoil(ushort start, bool value);
+        public DataResult<bool> WriteCoil(ushort start, bool value);
+
+        public Task<DataResult<bool>> WriteCoilAsync(ushort start, bool value);
 
         /// <summary>
         /// 写入16位地址
@@ -45,7 +51,9 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="start"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool WriteInt16(short start, short value);
+        public DataResult<bool> WriteInt16(short start, short value);
+
+        public Task<DataResult<bool>> WriteInt16Async(short start, short value);
 
         /// <summary>
         /// 写入一个float，占用4个字节，32位单精度数据
@@ -86,6 +94,8 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         public DataResult<short> ReadInt16(ushort start);
 
+        public Task<DataResult<short>> ReadInt16Async(ushort start);
+
         /// <summary>
         /// 写入Int32
         /// </summary>
@@ -114,7 +124,7 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="start">起始寄存器</param>
         /// <param name="value">结束</param>
         /// <param name="length">必须指定长度，为了提醒你</param>
-        public void WriteString(ushort start, string value, int length);
+        public DataResult<bool> WriteString(ushort start, string value, int length);
 
         /// <summary>
         /// 读取字符串

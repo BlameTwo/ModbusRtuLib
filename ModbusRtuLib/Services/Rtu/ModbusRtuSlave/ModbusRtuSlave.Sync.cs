@@ -31,11 +31,6 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<bool>.NG("写入错误！");
     }
 
-    public async Task<DataResult<bool>> ReadCoilSingleAsync(ushort start)
-    {
-        return await Task.Factory.StartNew(() => ReadCoilSingle(start));
-    }
-
     public DataResult<ushort> ReadHoldingRegisterSingle(ushort start)
     {
         if (!SerialPort.IsOpen)
@@ -44,10 +39,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         }
 
         var single = ReadHoldingRegister(Config.SlaveId, start, 0001);
-        if (single.Length == 2)
+        if (single.Item2.Length == 2)
         {
-            Array.Reverse(single);
-            return DataResult<ushort>.OK(BitConverter.ToUInt16(single, 0));
+            Array.Reverse(single.Item2);
+            return DataResult<ushort>.OK(
+                BitConverter.ToUInt16(single.Item2, 0),
+                single.Item1,
+                single.Item2
+            );
         }
         return DataResult<ushort>.NG("写入错误！");
     }
@@ -60,19 +59,25 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         }
 
         var single = ReadDiscrete(Config.SlaveId, start, 0001);
-        if (single.Length == 1)
+        if (single.Item1 == null)
+            return DataResult<bool>.NG("错误数据");
+        if (single.Item2.Length == 1)
         {
-            return DataResult<bool>.OK(Convert.ToBoolean(single[0]));
+            return DataResult<bool>.OK(
+                Convert.ToBoolean(single.Item2[0]),
+                single.Item1,
+                single.Item2
+            );
         }
-        return DataResult<bool>.NG("写入错误！");
+        return DataResult<bool>.NG("读取错误！");
     }
 
-    public byte[] ReadHoldingRegister(byte id, ushort start, ushort length)
+    public (byte[], byte[]) ReadHoldingRegister(byte id, ushort start, ushort length)
     {
         var value = ReadData(id, 0x03, start, length);
         byte[] result = new byte[length * 2];
         Array.Copy(value.Item2, 3, result, 0, length * 2);
-        return result;
+        return (value.Item1, result);
     }
 
     (byte[], byte[]) ReadCoil(byte id, ushort start, ushort length)
@@ -87,16 +92,16 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return new(null, null);
     }
 
-    byte[] ReadDiscrete(byte id, ushort start, ushort length)
+    (byte[], byte[]) ReadDiscrete(byte id, ushort start, ushort length)
     {
         var value = ReadData(id, 0x02, start, length);
         if (value.Item2 != null)
         {
             byte[] result = new byte[length];
             Array.Copy(value.Item2, 3, result, 0, length);
-            return result;
+            return new(value.Item1, result);
         }
-        return new byte[length];
+        return new(null, null);
     }
 
     (byte[], byte[]) ReadData(byte id, byte method, ushort start, ushort length)
@@ -131,7 +136,7 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
     /// <param name="id"></param>
     /// <param name="start"></param>
     /// <param name="value"></param>
-    public bool WriteCoil(ushort start, bool value)
+    public DataResult<bool> WriteCoil(ushort start, bool value)
     {
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
@@ -150,9 +155,9 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         var a = CRC.CheckCRC(resultByte, 0x05, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
-            return true;
+            return DataResult<bool>.OK(true, data.ToArray(), resultByte);
         }
-        return false;
+        return DataResult<bool>.NG("写入错误");
     }
 
     public bool WriteDouble(ushort start, double value)
@@ -176,7 +181,7 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return true;
     }
 
-    public bool WriteInt16(short start, short value)
+    public DataResult<bool> WriteInt16(short start, short value)
     {
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
@@ -194,9 +199,9 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         var a = CRC.CheckCRC(resultByte, 0x06, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
-            return true;
+            return DataResult<bool>.OK(true, data.ToArray(), resultByte);
         }
-        return false;
+        return DataResult<bool>.NG("发送错误，CRC校验失败");
     }
 
     public void WriteFloat(short start, float value)
@@ -242,41 +247,41 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
     public DataResult<long> ReadLong(ushort start)
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, 4);
-        var l = ByteConvert.BackLong(result, Config.DataFormat);
+        var l = ByteConvert.BackLong(result.Item2, Config.DataFormat);
         var result2 = BitConverter.ToInt64(l, 0);
-        return DataResult<long>.OK(result2);
+        return DataResult<long>.OK(result2, result.Item1, result.Item2);
     }
 
     public DataResult<float> ReadFloat(ushort start)
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, 2);
-        var l = ByteConvert.BackFloat(result, Config.DataFormat);
+        var l = ByteConvert.BackFloat(result.Item2, Config.DataFormat);
         var result2 = BitConverter.ToSingle(l, 0);
-        return DataResult<float>.OK(result2);
+        return DataResult<float>.OK(result2, result.Item1, result.Item2);
     }
 
     public DataResult<short> ReadInt16(ushort start)
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, 1);
-        var l = ByteConvert.BackInt16(result, Config.DataFormat);
+        var l = ByteConvert.BackInt16(result.Item2, Config.DataFormat);
         var result2 = BitConverter.ToInt16(l, 0);
-        return DataResult<short>.OK(result2);
+        return DataResult<short>.OK(result2, result.Item1, result.Item2);
     }
 
     public DataResult<double> ReadDouble(ushort start)
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, 4);
-        var l = ByteConvert.BackDouble(result, Config.DataFormat);
+        var l = ByteConvert.BackDouble(result.Item2, Config.DataFormat);
         var result2 = BitConverter.ToDouble(l, 0);
-        return DataResult<double>.OK(result2);
+        return DataResult<double>.OK(result2, result.Item1, result.Item2);
     }
 
-    public void WriteString(ushort start, string value, int Bytelength)
+    public DataResult<bool> WriteString(ushort start, string value, int Bytelength)
     {
         var stringBytes = Config.StringEncoding.GetBytes(value);
         if (stringBytes.Length > Bytelength)
         {
-            return;
+            return DataResult<bool>.NG("长度超量");
         }
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
@@ -300,14 +305,20 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
         var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        if (a)
+        {
+            return DataResult<bool>.OK(true);
+        }
+
+        return DataResult<bool>.NG("CRC校验失败");
     }
 
     public DataResult<string> ReadString(ushort start, ushort length)
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, length);
-        var l = ByteConvert.ToStringWorld(result, Config.DataFormat);
+        var l = ByteConvert.ToStringWorld(result.Item2, Config.DataFormat);
         var str = Config.StringEncoding.GetString(l);
-        return DataResult<string>.OK(str);
+        return DataResult<string>.OK(str, result.Item1, result.Item2);
     }
 
     public DataResult<bool> WriteInt32(ushort start, int value)
@@ -332,8 +343,8 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
     public DataResult<int> ReadInt32(ushort start)
     {
         var bytes = this.ReadHoldingRegister(this.Config.SlaveId, start, 0002);
-        var floatByte = ByteConvert.BackInt32(bytes, Config.DataFormat);
+        var floatByte = ByteConvert.BackInt32(bytes.Item2, Config.DataFormat);
         var f = BitConverter.ToInt32(floatByte, 0);
-        return DataResult<int>.OK(f);
+        return DataResult<int>.OK(f, bytes.Item1, bytes.Item2);
     }
 }

@@ -209,7 +209,8 @@
             <TextBox
                 Grid.Column="1"
                 Margin="5,0,0,0"
-                PlaceholderText="Station" />
+                PlaceholderText="Station"
+                Text="{x:Bind ViewModel.SlaveDevice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <DropDownButton
                 Grid.Column="2"
                 Margin="5,0,0,0"
@@ -217,11 +218,11 @@
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem Command="{x:Bind ViewModel.ReadSingileCoilCommand}" Text="Coil Regsiter" />
-                        <MenuFlyoutItem Text="Discrete Regsiter" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadSingleDiscreteCommand}" Text="Discrete Regsiter" />
                         <MenuFlyoutItem Text="Holding Regsiter" />
                         <MenuFlyoutItem Text="Input Regsiter" />
                         <MenuFlyoutSubItem Text="Data">
-                            <MenuFlyoutItem Text="Int16" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.ReadInt16Command}" Text="Int16" />
                             <MenuFlyoutItem Text="Int32" />
                             <MenuFlyoutItem Text="Float" />
                             <MenuFlyoutItem Text="Double" />

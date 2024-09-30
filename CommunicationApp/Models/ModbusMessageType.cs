@@ -13,6 +13,8 @@ public enum ModbusMessageType
     /// 接收
     /// </summary>
     Tx,
+
+    Data,
 }
 
 public class ModbusMessage
@@ -23,6 +25,8 @@ public class ModbusMessage
     {
         this.Time = DateTime.Now;
     }
+
+    public string Data { get; set; }
 
     public DateTime Time { get; set; }
 

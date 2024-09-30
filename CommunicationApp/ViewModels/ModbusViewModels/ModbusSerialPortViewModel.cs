@@ -71,6 +71,9 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
     string _startPostion = "0001";
 
     [ObservableProperty]
+    int _slaveDevice;
+
+    [ObservableProperty]
     Parity _selectParity;
 
     [ObservableProperty]
