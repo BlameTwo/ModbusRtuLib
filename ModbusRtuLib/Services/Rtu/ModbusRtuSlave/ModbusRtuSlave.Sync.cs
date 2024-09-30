@@ -130,12 +130,6 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return (null, null);
     }
 
-    /// <summary>
-    /// 写入线圈
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="start"></param>
-    /// <param name="value"></param>
     public DataResult<bool> WriteCoil(ushort start, bool value)
     {
         List<byte> data = new List<byte>();
@@ -160,14 +154,13 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<bool>.NG("写入错误");
     }
 
-    public bool WriteDouble(ushort start, double value)
+    public DataResult<bool> WriteDouble(ushort start, double value)
     {
         var byteValue = BitConverter.GetBytes(value);
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
         data.Add(0x10);
-        data.Add((byte)(start / 256));
-        data.Add((byte)(start % 256));
+        data.AddRange(ByteConvert.GetStartBytes(start));
         data.Add(0x00);
         data.Add(0x04);
         data.Add(8);
@@ -178,10 +171,16 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
-        return true;
+        SerialPort.Read(resultByte, 0, count);
+        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        if (a)
+        {
+            return DataResult<bool>.OK(true, data.ToArray(), resultByte);
+        }
+        return DataResult<bool>.NG("CRC校验失败");
     }
 
-    public DataResult<bool> WriteInt16(short start, short value)
+    public DataResult<bool> WriteInt16(ushort start, short value)
     {
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
@@ -204,14 +203,13 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<bool>.NG("发送错误，CRC校验失败");
     }
 
-    public void WriteFloat(short start, float value)
+    public DataResult<bool> WriteFloat(ushort start, float value)
     {
         var byteValue = BitConverter.GetBytes(value);
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
         data.Add(0x10);
-        data.Add((byte)(start / 256));
-        data.Add((byte)(start % 256));
+        data.AddRange(ByteConvert.GetStartBytes(start));
         data.Add(0x00);
         data.Add(0x02);
         data.Add(4);
@@ -222,16 +220,22 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
+        SerialPort.Read(resultByte, 0, count);
+        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        if (a)
+        {
+            return DataResult<bool>.OK(true, data.ToArray(), resultByte);
+        }
+        return DataResult<bool>.NG("发送错误，CRC校验失败");
     }
 
-    public void WriteLong(short start, long value)
+    public DataResult<bool> WriteInt64(ushort start, long value)
     {
         var byteValue = BitConverter.GetBytes(value);
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
         data.Add(0x10);
-        data.Add((byte)(start / 256));
-        data.Add((byte)(start % 256));
+        data.AddRange(ByteConvert.GetStartBytes(start));
         data.Add(0x00);
         data.Add(0x04);
         data.Add(8);
@@ -242,9 +246,16 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
+        SerialPort.Read(resultByte, 0, count);
+        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        if (a)
+        {
+            return DataResult<bool>.OK(true, data.ToArray(), resultByte);
+        }
+        return DataResult<bool>.NG("发送错误，CRC校验失败");
     }
 
-    public DataResult<long> ReadLong(ushort start)
+    public DataResult<long> ReadInt64(ushort start)
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, 4);
         var l = ByteConvert.BackLong(result.Item2, Config.DataFormat);
@@ -286,15 +297,13 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         List<byte> data = new List<byte>();
         data.Add(Config.SlaveId);
         data.Add(0x10);
-        data.Add((byte)(start / 256));
-        data.Add((byte)(start % 256));
+        data.AddRange(ByteConvert.GetStartBytes(start));
         var bytes = ByteConvert.ToStringWorld(
             Config.StringEncoding.PadToLength(value, Bytelength),
             Config.DataFormat
         );
         ushort Ulength = (ushort)bytes.Length;
-        data.Add((byte)(Ulength / 256));
-        data.Add((byte)(Ulength % 256));
+        data.AddRange(ByteConvert.GetLength(start));
         data.Add((byte)bytes.Length);
         data.AddRange(bytes);
         byte[] crc = CRC.Crc16(data.ToArray(), data.Count);
@@ -337,7 +346,13 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
-        return DataResult<bool>.OK(true);
+        SerialPort.Read(resultByte, 0, count);
+        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        if (a)
+        {
+            return DataResult<bool>.OK(true, data.ToArray(), resultByte);
+        }
+        return DataResult<bool>.NG("发送错误，CRC校验失败");
     }
 
     public DataResult<int> ReadInt32(ushort start)

@@ -204,6 +204,8 @@
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <TextBox PlaceholderText="Start" Text="{x:Bind ViewModel.StartPostion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <TextBox
@@ -219,41 +221,78 @@
                     <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem Command="{x:Bind ViewModel.ReadSingileCoilCommand}" Text="Coil Regsiter" />
                         <MenuFlyoutItem Command="{x:Bind ViewModel.ReadSingleDiscreteCommand}" Text="Discrete Regsiter" />
-                        <MenuFlyoutItem Text="Holding Regsiter" />
-                        <MenuFlyoutItem Text="Input Regsiter" />
+                        <MenuFlyoutItem IsEnabled="False" Text="Holding Regsiter" />
+                        <MenuFlyoutItem IsEnabled="False" Text="Input Regsiter" />
                         <MenuFlyoutSubItem Text="Data">
                             <MenuFlyoutItem Command="{x:Bind ViewModel.ReadInt16Command}" Text="Int16" />
-                            <MenuFlyoutItem Text="Int32" />
-                            <MenuFlyoutItem Text="Float" />
-                            <MenuFlyoutItem Text="Double" />
-                            <MenuFlyoutItem Text="Int64" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.ReadInt32Command}" Text="Int32" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.ReadFloatCommand}" Text="Float" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.ReadDoubleCommand}" Text="Double" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.ReadInt64Command}" Text="Int64" />
                         </MenuFlyoutSubItem>
                     </MenuFlyout>
                 </DropDownButton.Flyout>
             </DropDownButton>
-            <DropDownButton
+            <TextBox
                 Grid.Column="3"
+                Margin="5,0,0,0"
+                PlaceholderText="WriteValue"
+                Text="{x:Bind ViewModel.WriteData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <DropDownButton
+                Grid.Column="4"
                 Margin="5,0,0,0"
                 Content="Write">
                 <DropDownButton.Flyout>
                     <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem Text="Coil Regsiter" />
-                        <MenuFlyoutItem Text="Holding Regsiter" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WriteSingileCoilCommand}" Text="Coil Regsiter" />
                         <MenuFlyoutSubItem Text="Data">
-                            <MenuFlyoutItem Text="Int16" />
-                            <MenuFlyoutItem Text="Int32" />
-                            <MenuFlyoutItem Text="Float" />
-                            <MenuFlyoutItem Text="Double" />
-                            <MenuFlyoutItem Text="Int64" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.WriteInt16Command}" Text="Int16" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.WriteInt32Command}" Text="Int32" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.WriteInt64Command}" Text="Int64" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.WriteFloatCommand}" Text="Float" />
+                            <MenuFlyoutItem Command="{x:Bind ViewModel.WriteDoubleCommand}" Text="Double" />
                         </MenuFlyoutSubItem>
                     </MenuFlyout>
                 </DropDownButton.Flyout>
             </DropDownButton>
+            <StackPanel
+                Grid.Column="5"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Padding="4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Command="{x:Bind ViewModel.ClearMessageCommand}"
+                    Style="{ThemeResource TransparentButtonStyle}">
+                    <FontIcon
+                        FontFamily="Segoe Fluent Icons"
+                        FontSize="15"
+                        Glyph="&#xE897;" />
+                </Button>
+                <Button
+                    Margin="5,0,0,0"
+                    Padding="4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Command="{x:Bind ViewModel.ClearMessageCommand}"
+                    Style="{ThemeResource TransparentButtonStyle}">
+                    <FontIcon
+                        FontFamily="Segoe Fluent Icons"
+                        FontSize="15"
+                        Glyph="&#xE894;" />
+                </Button>
+            </StackPanel>
         </Grid>
         <ListView
             Grid.Row="2"
             Margin="0,5,0,0"
             ItemsSource="{x:Bind ViewModel.ModbusMessages, Mode=OneWay}">
+            <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <AddDeleteThemeTransition />
+                </TransitionCollection>
+            </ListView.ItemContainerTransitions>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="model:ModbusMessage">
                     <Grid>
@@ -262,10 +301,14 @@
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Bind Type}" />
+                        <TextBlock
+                            Grid.Column="0"
+                            Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                            Text="{x:Bind Type}" />
                         <TextBlock
                             Grid.Column="1"
                             Margin="20,0,0,0"
+                            Foreground="PowderBlue"
                             Text="{x:Bind Value}" />
                         <TextBlock
                             Grid.Column="2"

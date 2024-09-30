@@ -34,6 +34,8 @@ public class ModbusMessage
     {
         set
         {
+            if (value == null)
+                return;
             foreach (var item in value)
             {
                 this.Value += Convert.ToString(item, 16).ToUpper() + " ";

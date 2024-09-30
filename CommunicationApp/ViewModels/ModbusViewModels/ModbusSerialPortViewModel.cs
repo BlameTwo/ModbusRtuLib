@@ -46,7 +46,7 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
         };
 
     [ObservableProperty]
-    StopBits _selectStopBit;
+    StopBits _selectStopBit = System.IO.Ports.StopBits.One;
 
     [ObservableProperty]
     ObservableCollection<int> dataBit = new() { 5, 6, 7, 8 };
@@ -55,13 +55,13 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
     bool enableStart = true;
 
     [ObservableProperty]
-    int _selectBit;
+    int _selectBit = 8;
 
     [ObservableProperty]
     SolidColorBrush _connectStatus = new SolidColorBrush(Colors.Gray);
 
     [ObservableProperty]
-    double _baudRate;
+    double _baudRate = 9600;
 
     [ObservableProperty]
     ObservableCollection<Parity> paritys =
@@ -74,7 +74,7 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
     int _slaveDevice;
 
     [ObservableProperty]
-    Parity _selectParity;
+    Parity _selectParity = Parity.None;
 
     [ObservableProperty]
     ObservableCollection<DataFormat> dataFormats =
@@ -84,7 +84,7 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
     ObservableCollection<ModbusMessage> modbusMessages = new ObservableCollection<ModbusMessage>();
 
     [ObservableProperty]
-    DataFormat _selectFormat;
+    DataFormat _selectFormat = DataFormat.CDAB;
 
     IModbusRtuClient rtuClient = null;
     IModbusAsciiClient asciiClient = null;
@@ -96,7 +96,6 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
         {
             if (rtuClient != null)
             {
-                rtuClient.DataRecived -= Port_DataReceived;
                 rtuClient.ConnectChanged -= RtuClient_ConnectChanged;
                 rtuClient.Dispose();
                 rtuClient = null;
@@ -114,8 +113,18 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
                     p.WriteTimeSpan = 200;
                     p.ReadTimeSpan = 200;
                 });
+            if (this.SlaveDevice != 0)
+            {
+                rtuClient.AddSlave(p =>
+                {
+                    p.DataFormat = SelectFormat;
+                    p.ReadTimeSpan = 200;
+                    p.SlaveId = (byte)SlaveDevice;
+                    p.IsCheckSlave = true;
+                    p.WriteTimepan = 200;
+                });
+            }
 
-            rtuClient.DataRecived += Port_DataReceived;
             rtuClient.ConnectChanged += RtuClient_ConnectChanged;
             rtuClient.SetupStart();
             _runType = ModbusRunType.Rtu;
@@ -131,7 +140,6 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
         if (rtuClient != null)
         {
             this.rtuClient.Close();
-            rtuClient.DataRecived -= Port_DataReceived;
             rtuClient.ConnectChanged -= RtuClient_ConnectChanged;
             this.rtuClient.Dispose();
             this.rtuClient = null;
@@ -152,5 +160,34 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
         }
     }
 
-    private void Port_DataReceived(object sender, ModbusDataModel message) { }
+    [RelayCommand]
+    void ClearMessage()
+    {
+        this.ModbusMessages.Clear();
+    }
+
+    public void AddMessage<T>(DataResult<T> result)
+    {
+        ModbusMessages.Add(
+            new Models.ModbusMessage()
+            {
+                Type = Models.ModbusMessageType.Rx,
+                Datas = result.OrginSend,
+            }
+        );
+        ModbusMessages.Add(
+            new Models.ModbusMessage()
+            {
+                Type = Models.ModbusMessageType.Tx,
+                Datas = result.ReceivedData,
+            }
+        );
+        ModbusMessages.Add(
+            new Models.ModbusMessage()
+            {
+                Value = result.Data.ToString(),
+                Type = Models.ModbusMessageType.Data,
+            }
+        );
+    }
 }

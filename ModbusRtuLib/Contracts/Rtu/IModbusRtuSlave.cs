@@ -14,8 +14,6 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         public DataResult<bool> ReadCoilSingle(ushort start);
 
-        public Task<DataResult<bool>> ReadCoilSingleAsync(ushort start);
-
         /// <summary>
         /// 读取单个保持寄存器
         /// </summary>
@@ -23,16 +21,12 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         public DataResult<ushort> ReadHoldingRegisterSingle(ushort start);
 
-        public Task<DataResult<ushort>> ReadHoldingRegisterSingleAsync(ushort start);
-
         /// <summary>
         /// 读取单个离散寄存器
         /// </summary>
         /// <param name="start"></param>
         /// <returns></returns>
         public DataResult<bool> ReadDiscreteSingle(ushort start);
-
-        public Task<DataResult<bool>> ReadDiscreteSingleAsync(ushort start);
 
         /// <summary>
         /// 写入单个线圈
@@ -43,17 +37,15 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <returns></returns>
         public DataResult<bool> WriteCoil(ushort start, bool value);
 
-        public Task<DataResult<bool>> WriteCoilAsync(ushort start, bool value);
-
         /// <summary>
         /// 写入16位地址
         /// </summary>
         /// <param name="start"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public DataResult<bool> WriteInt16(short start, short value);
+        public DataResult<bool> WriteInt16(ushort start, short value);
 
-        public Task<DataResult<bool>> WriteInt16Async(short start, short value);
+        public Task<DataResult<bool>> WriteInt16Async(ushort start, short value);
 
         /// <summary>
         /// 写入一个float，占用4个字节，32位单精度数据
@@ -61,7 +53,7 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="start"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public void WriteFloat(short start, float value);
+        public DataResult<bool> WriteFloat(ushort start, float value);
 
         /// <summary>
         /// 写入双浮点double，占用8个字节
@@ -69,16 +61,16 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="start"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool WriteDouble(ushort start, double value);
+        public DataResult<bool> WriteDouble(ushort start, double value);
 
         /// <summary>
         /// 写入long，占用8个字节，对应4个寄存器
         /// </summary>
         /// <param name="start"></param>
         /// <param name="value"></param>
-        public void WriteLong(short start, long value);
+        public DataResult<bool> WriteInt64(ushort start, long value);
 
-        public DataResult<long> ReadLong(ushort start);
+        public DataResult<long> ReadInt64(ushort start);
 
         /// <summary>
         /// 读取单精度浮点数，对应保持寄存器2个
@@ -133,5 +125,33 @@ namespace ModbusRtuLib.Contracts.Rtu
         /// <param name="length"></param>
         /// <returns></returns>
         public DataResult<string> ReadString(ushort start, ushort length);
+
+        public Task<DataResult<bool>> WriteInt32Async(ushort start, int value);
+
+        public Task<DataResult<int>> ReadInt32Async(ushort start);
+
+        public Task<DataResult<bool>> WriteDoubleAsync(ushort start, double value);
+
+        public Task<DataResult<double>> ReadDoubleAsync(ushort start);
+
+        public Task<DataResult<bool>> ReadCoilSingleAsync(ushort start);
+
+        public Task<DataResult<ushort>> ReadHoldingRegisterSingleAsync(ushort start);
+
+        public Task<DataResult<bool>> ReadDiscreteSingleAsync(ushort start);
+
+        public Task<DataResult<bool>> WriteCoilAsync(ushort start, bool value);
+
+        public Task<DataResult<bool>> WriteFloatAsync(ushort start, float value);
+
+        public Task<DataResult<float>> ReadFloatAsync(ushort start);
+
+        public Task<DataResult<string>> ReadStringAsync(ushort start, ushort bytelength);
+
+        public Task<DataResult<bool>> WriteStringAsync(ushort start, string value, int Bytelength);
+
+        public Task<DataResult<bool>> WriteInt64Async(ushort start, long value);
+
+        public Task<DataResult<long>> ReadInt64Async(ushort start);
     }
 }
