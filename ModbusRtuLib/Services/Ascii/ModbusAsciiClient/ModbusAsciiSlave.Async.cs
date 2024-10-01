@@ -130,5 +130,15 @@ namespace ModbusRtuLib.Services.Ascii
             );
             return DataResult<bool>.OK(true);
         }
+
+        public async Task<DataResult<bool>> WriteInt32Async(ushort start, int value)
+        {
+            return await Task.Factory.StartNew(() => WriteInt32(start, value));
+        }
+
+        public async Task<DataResult<int>> ReadInt32Async(ushort start)
+        {
+            return await Task.Factory.StartNew(() => ReadInt32(start));
+        }
     }
 }
