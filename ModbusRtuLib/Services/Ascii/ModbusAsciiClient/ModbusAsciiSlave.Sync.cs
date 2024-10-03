@@ -129,6 +129,17 @@ partial class ModbusAsciiSlave
         return DataResult<bool>.NG("写入功能码与站号不同！");
     }
 
+    public DataResult<double> ReadDouble(ushort start)
+    {
+        byte[] inputbytes = null;
+        inputbytes = ReadHoldingRegisters(start, 0x0004);
+        var inputresult = BitConverter.ToDouble(
+            ByteConvert.BackDouble(inputbytes, this.Config.DataFormat),
+            0
+        );
+        return DataResult<double>.OK(inputresult);
+    }
+
     public DataResult<short> ReadInt16(ushort start, ReadType readType = ReadType.HoldingRegister)
     {
         byte[] inputbytes = null;

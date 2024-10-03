@@ -19,6 +19,21 @@ namespace ModbusRtuLib.Services.Ascii
             return Task.Factory.StartNew(() => ReadDatas(start, method, length));
         }
 
+        public async Task<DataResult<bool>> ReadDiscreteAsync(ushort start)
+        {
+            return await Task.Factory.StartNew(() => ReadDiscrete(start));
+        }
+
+        public async Task<DataResult<long>> ReadInt64Async(ushort start)
+        {
+            return await Task.Factory.StartNew(() => ReadInt64(start));
+        }
+
+        public async Task<DataResult<float>> ReadFloatAsync(ushort start)
+        {
+            return await Task.Factory.StartNew(() => ReadFloat(start));
+        }
+
         public async Task<DataResult<bool>> WriteSingleCoilAsync(ushort start, bool value)
         {
             List<byte> writeByte = new();
@@ -139,6 +154,16 @@ namespace ModbusRtuLib.Services.Ascii
         public async Task<DataResult<int>> ReadInt32Async(ushort start)
         {
             return await Task.Factory.StartNew(() => ReadInt32(start));
+        }
+
+        public async Task<DataResult<bool>> WriteDoubleAsync(ushort start, double value)
+        {
+            return await Task.Factory.StartNew(() => this.WriteDouble(start, value));
+        }
+
+        public async Task<DataResult<double>> ReadDoubleAsync(ushort start)
+        {
+            return await Task.Factory.StartNew(() => this.ReadDouble(start));
         }
     }
 }

@@ -58,7 +58,10 @@ namespace ModbusRtuLib.Common
             {
                 rtu.Setup();
             }
-
+            if (client is ModbusAsciiClient ascii)
+            {
+                ascii.Setup();
+            }
             return client;
         }
 

@@ -129,9 +129,57 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
             rtuClient.SetupStart();
             _runType = ModbusRunType.Rtu;
         }
-        else if (SelectContract == "Ascii") { }
+        else if (SelectContract == "Ascii")
+        {
+            if (asciiClient != null)
+            {
+                asciiClient.ConnectChanged -= AsciiClient_ConnectChanged;
+                asciiClient.Dispose();
+                asciiClient = null;
+            }
+            asciiClient = DeviceFactory
+                .CreateDefaultAsciiClient(this.SelectPort)
+                .InitSerialPort(p =>
+                {
+                    p.SerialPortName = this.SelectPort;
+                    p.BaudRate = Convert.ToInt32(this.BaudRate);
+                    p.DataFormat = SelectFormat;
+                    p.Parity = SelectParity;
+                    p.DataBit = SelectBit;
+                    p.StopBit = SelectStopBit;
+                    p.WriteTimeSpan = 200;
+                    p.ReadTimeSpan = 200;
+                });
+            if (this.SlaveDevice != 0)
+            {
+                asciiClient.AddSlave(p =>
+                {
+                    p.DataFormat = SelectFormat;
+                    p.ReadTimeSpan = 200;
+                    p.SlaveId = (byte)SlaveDevice;
+                    p.IsCheckSlave = true;
+                    p.WriteTimepan = 200;
+                });
+            }
+
+            asciiClient.ConnectChanged += AsciiClient_ConnectChanged;
+            asciiClient.SetupStart();
+            _runType = ModbusRunType.Ascii;
+        }
 
         EnableStart = false;
+    }
+
+    private void AsciiClient_ConnectChanged(object sender, bool connect)
+    {
+        if (connect == true)
+        {
+            this.ConnectStatus = new SolidColorBrush(Colors.Green);
+        }
+        else
+        {
+            this.ConnectStatus = new SolidColorBrush(Colors.Gray);
+        }
     }
 
     [RelayCommand]
@@ -143,6 +191,14 @@ public sealed partial class ModbusSerialPortViewModel : ObservableObject
             rtuClient.ConnectChanged -= RtuClient_ConnectChanged;
             this.rtuClient.Dispose();
             this.rtuClient = null;
+            EnableStart = true;
+        }
+        if (asciiClient != null)
+        {
+            this.asciiClient.Close();
+            asciiClient.ConnectChanged -= RtuClient_ConnectChanged;
+            this.asciiClient.Dispose();
+            this.asciiClient = null;
             EnableStart = true;
         }
         GC.Collect();

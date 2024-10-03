@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using ModbusRtuLib.Contracts.Ascii;
 using ModbusRtuLib.Models;
+using ModbusRtuLib.Models.Handlers;
 
 namespace ModbusRtuLib.Services.Ascii
 {
@@ -14,6 +15,22 @@ namespace ModbusRtuLib.Services.Ascii
         public bool IsConnected => Port.IsOpen;
 
         readonly Dictionary<int, ModbusSlaveConfig> slaves = new();
+        private bool disposedValue;
+
+        private ModbusDataReceived dataRevicedHandler;
+
+        private ModbusConnectChanged connecthandler;
+
+        public event ModbusDataReceived DataRecived
+        {
+            add => dataRevicedHandler += value;
+            remove => dataRevicedHandler -= value;
+        }
+        public event ModbusConnectChanged ConnectChanged
+        {
+            add => connecthandler += value;
+            remove => connecthandler -= value;
+        }
 
         public void AddSlave(ModbusSlaveConfig modbusRtuSlaveConfig)
         {
@@ -53,6 +70,40 @@ namespace ModbusRtuLib.Services.Ascii
             Port.Parity = Config.Parity;
             Port.Handshake = Config.Handshake;
             Port.Open();
+            this.connecthandler?.Invoke(this, Port.IsOpen);
+        }
+
+        public void Close()
+        {
+            this.Port.Close();
+            this.connecthandler?.Invoke(this, Port.IsOpen);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    this.Port.Close();
+                    this.Port.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~ModbusAsciiClient()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

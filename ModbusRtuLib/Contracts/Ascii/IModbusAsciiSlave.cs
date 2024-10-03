@@ -30,6 +30,8 @@ namespace ModbusRtuLib.Contracts.Ascii
         /// <returns></returns>
         public DataResult<bool> ReadDiscrete(ushort start);
 
+        public Task<DataResult<bool>> ReadDiscreteAsync(ushort start);
+
         /// <summary>
         /// 读取Int16 一个modbus 寄存器地址的数据
         /// </summary>
@@ -56,6 +58,8 @@ namespace ModbusRtuLib.Contracts.Ascii
         /// <returns></returns>
         public DataResult<float> ReadFloat(ushort start);
 
+        public Task<DataResult<float>> ReadFloatAsync(ushort start);
+
         /// <summary>
         /// 写入单精度浮点
         /// </summary>
@@ -71,11 +75,15 @@ namespace ModbusRtuLib.Contracts.Ascii
 
         public DataResult<long> ReadInt64(ushort start);
 
+        public Task<DataResult<long>> ReadInt64Async(ushort start);
+
         public DataResult<bool> WriteString(ushort start, string value, ushort length);
 
         public DataResult<string> ReadString(ushort start, ushort length);
 
         public DataResult<bool> WriteDouble(ushort start, double value);
+
+        public DataResult<double> ReadDouble(ushort start);
         #endregion
 
         #region 异步
@@ -118,8 +126,10 @@ namespace ModbusRtuLib.Contracts.Ascii
 
         public Task<DataResult<int>> ReadInt32Async(ushort start);
 
+        public Task<DataResult<bool>> WriteDoubleAsync(ushort start, double value);
+
         public Task<DataResult<double>> ReadDoubleAsync(ushort start);
-        public Task<DataResult<double>> WriteDoubleAsync(ushort start);
+
         #endregion
 
         #region 基础

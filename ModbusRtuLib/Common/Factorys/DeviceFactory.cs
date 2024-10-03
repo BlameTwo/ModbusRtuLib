@@ -22,6 +22,7 @@ public static class DeviceFactory
     {
         return new ModbusRtuClient().InitSerialPort(p =>
         {
+            p.SerialPortName = "COM2";
             p.BaudRate = 9600;
             p.DataBit = 8;
             p.StopBit = System.IO.Ports.StopBits.One;
