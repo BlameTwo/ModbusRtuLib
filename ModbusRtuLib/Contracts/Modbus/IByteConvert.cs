@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ModbusRtuLib.Models.Enums;
 
-namespace ModbusRtuLib.Contracts;
+namespace ModbusRtuLib.Contracts.Modbus;
 
 /// <summary>
 /// 字节序转换

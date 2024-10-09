@@ -1,7 +1,7 @@
 ﻿using System;
 using ModbusRtuLib.Models.Handlers;
 
-namespace ModbusRtuLib.Contracts
+namespace ModbusRtuLib.Contracts.Modbus
 {
     public interface IModbusClient : IDisposable
     {

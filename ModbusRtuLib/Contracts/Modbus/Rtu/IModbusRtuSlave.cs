@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using ModbusRtuLib.Models;
 
-namespace ModbusRtuLib.Contracts.Rtu
+namespace ModbusRtuLib.Contracts.Modbus.Rtu
 {
     public interface IModbusRtuSlave
     {

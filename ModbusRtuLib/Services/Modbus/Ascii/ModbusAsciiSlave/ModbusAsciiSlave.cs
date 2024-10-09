@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ModbusRtuLib.Common;
-using ModbusRtuLib.Contracts;
-using ModbusRtuLib.Contracts.Ascii;
+using ModbusRtuLib.Contracts.Modbus;
+using ModbusRtuLib.Contracts.Modbus.Ascii;
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Enums;
 

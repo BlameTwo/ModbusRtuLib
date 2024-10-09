@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ModbusRtuLib.Contracts.Ascii;
-using ModbusRtuLib.Contracts.Rtu;
-using ModbusRtuLib.Contracts.Tcp;
+using ModbusRtuLib.Contracts.Modbus.Ascii;
+using ModbusRtuLib.Contracts.Modbus.Rtu;
+using ModbusRtuLib.Contracts.Modbus.Tcp;
 using ModbusRtuLib.Services.Ascii;
+using ModbusRtuLib.Services.Modbus.Ascii;
+using ModbusRtuLib.Services.Modbus.Rtu;
+using ModbusRtuLib.Services.Modbus.Tcp;
 using ModbusRtuLib.Services.Rtu;
 using ModbusRtuLib.Services.Tcp;
 

@@ -2,7 +2,7 @@
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Enums;
 
-namespace ModbusRtuLib.Contracts.Ascii
+namespace ModbusRtuLib.Contracts.Modbus.Ascii
 {
     public interface IModbusAsciiSlave
     {

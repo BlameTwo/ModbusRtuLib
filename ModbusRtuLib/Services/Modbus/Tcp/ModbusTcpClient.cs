@@ -1,9 +1,10 @@
 ﻿using ModbusRtuLib.Common;
 using ModbusRtuLib.Contracts;
-using ModbusRtuLib.Contracts.Tcp;
+using ModbusRtuLib.Contracts.Modbus.Tcp;
 using ModbusRtuLib.Models;
+using ModbusRtuLib.Services.Tcp;
 
-namespace ModbusRtuLib.Services.Tcp;
+namespace ModbusRtuLib.Services.Modbus.Tcp;
 
 public class ModbusTcpClient : IModbusTcpClient
 {
@@ -32,6 +33,6 @@ public class ModbusTcpClient : IModbusTcpClient
 
     public IModbusTcpSlave GetSlave(byte id)
     {
-        return new ModbusTcpSlave(this.Device, id);
+        return new ModbusTcpSlave(Device, id);
     }
 }

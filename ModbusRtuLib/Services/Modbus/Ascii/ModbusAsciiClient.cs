@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Ports;
-using ModbusRtuLib.Contracts.Ascii;
+using ModbusRtuLib.Contracts.Modbus.Ascii;
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Handlers;
+using ModbusRtuLib.Services.Ascii;
 
-namespace ModbusRtuLib.Services.Ascii
+namespace ModbusRtuLib.Services.Modbus.Ascii
 {
     internal class ModbusAsciiClient : IModbusAsciiClient
     {
@@ -70,13 +71,13 @@ namespace ModbusRtuLib.Services.Ascii
             Port.Parity = Config.Parity;
             Port.Handshake = Config.Handshake;
             Port.Open();
-            this.connecthandler?.Invoke(this, Port.IsOpen);
+            connecthandler?.Invoke(this, Port.IsOpen);
         }
 
         public void Close()
         {
-            this.Port.Close();
-            this.connecthandler?.Invoke(this, Port.IsOpen);
+            Port.Close();
+            connecthandler?.Invoke(this, Port.IsOpen);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -85,8 +86,8 @@ namespace ModbusRtuLib.Services.Ascii
             {
                 if (disposing)
                 {
-                    this.Port.Close();
-                    this.Port.Dispose();
+                    Port.Close();
+                    Port.Dispose();
                 }
                 disposedValue = true;
             }

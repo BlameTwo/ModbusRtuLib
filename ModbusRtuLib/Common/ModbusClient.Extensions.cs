@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using ModbusRtuLib.Contracts;
-using ModbusRtuLib.Contracts.Ascii;
-using ModbusRtuLib.Contracts.Rtu;
-using ModbusRtuLib.Contracts.Tcp;
+using ModbusRtuLib.Contracts.Modbus.Ascii;
+using ModbusRtuLib.Contracts.Modbus.Rtu;
+using ModbusRtuLib.Contracts.Modbus.Tcp;
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Enums;
-using ModbusRtuLib.Services.Ascii;
-using ModbusRtuLib.Services.Rtu;
+using ModbusRtuLib.Services.Modbus.Ascii;
+using ModbusRtuLib.Services.Modbus.Rtu;
 
 namespace ModbusRtuLib.Common
 {

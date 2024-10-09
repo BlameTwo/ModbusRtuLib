@@ -13,7 +13,8 @@
     <Grid>
         <Grid.ChildrenTransitions>
             <TransitionCollection>
-                <RepositionThemeTransition />
+                <AddDeleteThemeTransition />
+                <EntranceThemeTransition IsStaggeringEnabled="False" />
             </TransitionCollection>
         </Grid.ChildrenTransitions>
         <Grid.RowDefinitions>
@@ -291,6 +292,7 @@
             <ListView.ItemContainerTransitions>
                 <TransitionCollection>
                     <AddDeleteThemeTransition />
+                    <EntranceThemeTransition IsStaggeringEnabled="True" />
                 </TransitionCollection>
             </ListView.ItemContainerTransitions>
             <ListView.ItemTemplate>

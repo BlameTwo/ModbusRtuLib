@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
-using ModbusRtuLib.Contracts.Rtu;
+using ModbusRtuLib.Contracts.Modbus.Rtu;
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Handlers;
+using ModbusRtuLib.Services.Rtu;
 
-namespace ModbusRtuLib.Services.Rtu
+namespace ModbusRtuLib.Services.Modbus.Rtu
 {
     public sealed class ModbusRtuClient : IModbusRtuClient
     {
@@ -55,12 +56,12 @@ namespace ModbusRtuLib.Services.Rtu
             Port.Handshake = Config.Handshake;
             Port.DataReceived += Port_DataReceived;
             Port.Open();
-            this.connecthandler?.Invoke(this, Port.IsOpen);
+            connecthandler?.Invoke(this, Port.IsOpen);
         }
 
         private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            this.dataRevicedHandler?.Invoke(
+            dataRevicedHandler?.Invoke(
                 this,
                 new ModbusDataModel() { Type = Models.Enums.ModbusMessageDataType.Bytes }
             );
@@ -110,8 +111,8 @@ namespace ModbusRtuLib.Services.Rtu
 
         public void Close()
         {
-            this.Port.Close();
-            this.connecthandler?.Invoke(this, Port.IsOpen);
+            Port.Close();
+            connecthandler?.Invoke(this, Port.IsOpen);
         }
 
         private void Dispose(bool disposing)
@@ -120,8 +121,8 @@ namespace ModbusRtuLib.Services.Rtu
             {
                 if (disposing)
                 {
-                    this.Port.Close();
-                    this.Port.Dispose();
+                    Port.Close();
+                    Port.Dispose();
                 }
                 disposedValue = true;
             }

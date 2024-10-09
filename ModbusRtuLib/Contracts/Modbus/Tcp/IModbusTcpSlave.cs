@@ -1,6 +1,6 @@
 ﻿using ModbusRtuLib.Models;
 
-namespace ModbusRtuLib.Contracts.Tcp;
+namespace ModbusRtuLib.Contracts.Modbus.Tcp;
 
 public interface IModbusTcpSlave
 {

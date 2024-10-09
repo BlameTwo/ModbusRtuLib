@@ -1,6 +1,7 @@
 using CommunicationApp.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace CommunicationApp.Views
 {
@@ -19,6 +20,16 @@ namespace CommunicationApp.Views
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             view.IsPaneOpen = !view.IsPaneOpen;
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
         }
     }
 }

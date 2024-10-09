@@ -24,27 +24,49 @@
         </Grid.RowDefinitions>
         <ui:TitleBar
             x:Name="titleBar"
-            Title="CommunicationApp"
             x:FieldModifier="public"
             IsExtendsContentIntoTitleBar="True"
             TitleMode="Tall">
+            <ui:TitleBar.Title>
+                <TextBlock
+                    Margin="0,5,0,0"
+                    Foreground="{ThemeResource SystemColorGrayTextBrush}"
+                    Text="通信工具" />
+            </ui:TitleBar.Title>
             <ui:TitleBar.Header>
-                <Button
-                    Margin="10,10,0,0"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Click="Button_Click"
-                    Style="{ThemeResource TransparentButtonStyle}">
-                    <AnimatedIcon
-                        x:Name="AnimatedIcon"
-                        Width="15"
-                        Height="15">
-                        <AnimatedIcon.Source>
-                            <animatedvisuals:AnimatedGlobalNavigationButtonVisualSource />
-                        </AnimatedIcon.Source>
-                    </AnimatedIcon>
-
-                </Button>
+                <StackPanel Orientation="Horizontal">
+                    <Button
+                        Margin="10,10,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Command="{x:Bind ViewModel.GoBackCommand}"
+                        IsEnabled="{x:Bind ViewModel.IsBack, Mode=OneWay}"
+                        Style="{ThemeResource TransparentButtonStyle}">
+                        <AnimatedIcon
+                            x:Name="AnimatedBackIcon"
+                            Width="15"
+                            Height="15">
+                            <AnimatedIcon.Source>
+                                <animatedvisuals:AnimatedBackVisualSource />
+                            </AnimatedIcon.Source>
+                        </AnimatedIcon>
+                    </Button>
+                    <Button
+                        Margin="10,10,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Click="Button_Click"
+                        Style="{ThemeResource TransparentButtonStyle}">
+                        <AnimatedIcon
+                            x:Name="AnimatedIcon"
+                            Width="15"
+                            Height="15">
+                            <AnimatedIcon.Source>
+                                <animatedvisuals:AnimatedGlobalNavigationButtonVisualSource />
+                            </AnimatedIcon.Source>
+                        </AnimatedIcon>
+                    </Button>
+                </StackPanel>
             </ui:TitleBar.Header>
         </ui:TitleBar>
         <NavigationView
@@ -53,7 +75,9 @@
             Grid.RowSpan="1"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleButtonVisible="False"
-            IsSettingsVisible="False">
+            IsSettingsVisible="False"
+            IsTitleBarAutoPaddingEnabled="True"
+            SelectedItem="{x:Bind ViewModel.SelectItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <NavigationView.MenuItems>
                 <NavigationViewItemHeader Content="Modbus" />
                 <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.ModbusViewModels.ModbusSerialPortViewModel" Content="SerialPort">

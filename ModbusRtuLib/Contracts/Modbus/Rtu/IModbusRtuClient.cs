@@ -1,6 +1,7 @@
-﻿using ModbusRtuLib.Models;
+﻿using ModbusRtuLib.Contracts.Modbus;
+using ModbusRtuLib.Models;
 
-namespace ModbusRtuLib.Contracts.Rtu
+namespace ModbusRtuLib.Contracts.Modbus.Rtu
 {
     public interface IModbusRtuClient : IModbusClient
     {

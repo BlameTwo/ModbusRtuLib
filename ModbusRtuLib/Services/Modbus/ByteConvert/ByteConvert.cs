@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using ModbusRtuLib.Contracts;
+using ModbusRtuLib.Contracts.Modbus;
 using ModbusRtuLib.Models.Enums;
 
 namespace ModbusRtuLib.Services;

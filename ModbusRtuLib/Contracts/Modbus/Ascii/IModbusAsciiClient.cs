@@ -1,6 +1,7 @@
-﻿using ModbusRtuLib.Models;
+﻿using ModbusRtuLib.Contracts.Modbus;
+using ModbusRtuLib.Models;
 
-namespace ModbusRtuLib.Contracts.Ascii;
+namespace ModbusRtuLib.Contracts.Modbus.Ascii;
 
 public interface IModbusAsciiClient : IModbusClient
 {

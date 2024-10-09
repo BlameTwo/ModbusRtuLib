@@ -13,8 +13,8 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using ModbusRtuLib.Common;
 using ModbusRtuLib.Common.Factorys;
-using ModbusRtuLib.Contracts.Ascii;
-using ModbusRtuLib.Contracts.Rtu;
+using ModbusRtuLib.Contracts.Modbus.Ascii;
+using ModbusRtuLib.Contracts.Modbus.Rtu;
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Enums;
 

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using ModbusRtuLib.Contracts;
-using ModbusRtuLib.Contracts.Tcp;
+using ModbusRtuLib.Contracts.Modbus;
+using ModbusRtuLib.Contracts.Modbus.Tcp;
 using ModbusRtuLib.Models;
 
 namespace ModbusRtuLib.Services.Tcp;

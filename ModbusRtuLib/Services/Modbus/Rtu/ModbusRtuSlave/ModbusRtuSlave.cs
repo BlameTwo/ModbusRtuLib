@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Threading;
 using ModbusRtuLib.Common;
-using ModbusRtuLib.Contracts;
-using ModbusRtuLib.Contracts.Rtu;
+using ModbusRtuLib.Contracts.Modbus;
+using ModbusRtuLib.Contracts.Modbus.Rtu;
 using ModbusRtuLib.Models;
 
 namespace ModbusRtuLib.Services.Rtu;
