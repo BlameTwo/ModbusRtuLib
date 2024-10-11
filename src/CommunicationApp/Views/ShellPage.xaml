@@ -24,6 +24,8 @@
         </Grid.RowDefinitions>
         <ui:TitleBar
             x:Name="titleBar"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
             x:FieldModifier="public"
             IsExtendsContentIntoTitleBar="True"
             TitleMode="Tall">
@@ -33,6 +35,7 @@
                     Foreground="{ThemeResource SystemColorGrayTextBrush}"
                     Text="通信工具" />
             </ui:TitleBar.Title>
+            <AutoSuggestBox Width="300" QueryIcon="Find" />
             <ui:TitleBar.Header>
                 <StackPanel Orientation="Horizontal">
                     <Button
@@ -56,7 +59,8 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Click="Button_Click"
-                        Style="{ThemeResource TransparentButtonStyle}">
+                        Style="{ThemeResource TransparentButtonStyle}"
+                        Visibility="Collapsed">
                         <AnimatedIcon
                             x:Name="AnimatedIcon"
                             Width="15"
@@ -77,20 +81,43 @@
             IsPaneToggleButtonVisible="False"
             IsSettingsVisible="False"
             IsTitleBarAutoPaddingEnabled="True"
+            PaneDisplayMode="Top"
             SelectedItem="{x:Bind ViewModel.SelectItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <NavigationView.MenuItems>
-                <NavigationViewItemHeader Content="Modbus" />
-                <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.ModbusViewModels.ModbusSerialPortViewModel" Content="SerialPort">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="FluentSystemIcons-Filled" Glyph="&#xEB7B;" />
-                    </NavigationViewItem.Icon>
+                <NavigationViewItem Content="Modbus">
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.ModbusViewModels.ModbusSerialPortViewModel" Content="SerialPort">
+                            <NavigationViewItem.Icon>
+                                <FontIcon FontFamily="FluentSystemIcons-Filled" Glyph="&#xEB7B;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Tcp">
+                            <NavigationViewItem.Icon>
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC05;" />
+                            </NavigationViewItem.Icon>
+                        </NavigationViewItem>
+                    </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Tcp">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC05;" />
-                    </NavigationViewItem.Icon>
+                <NavigationViewItem Content="Mitsubishi">
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Qna3E SerialPort">
+                            <NavigationViewItem.MenuItems>
+                                <NavigationViewItem Content="Binary" />
+                                <NavigationViewItem Content="ASCII" />
+                            </NavigationViewItem.MenuItems>
+                        </NavigationViewItem>
+                        <NavigationViewItem Content="Qna3E Tcp">
+                            <NavigationViewItem.MenuItems>
+                                <NavigationViewItem Content="Binary" />
+                                <NavigationViewItem Content="ASCII" />
+                            </NavigationViewItem.MenuItems>
+                        </NavigationViewItem>
+                    </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
+            <NavigationView.PaneFooter>
+                <Button Content="帮助" />
+            </NavigationView.PaneFooter>
             <Frame x:Name="frame" />
         </NavigationView>
     </Grid>
