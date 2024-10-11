@@ -75,24 +75,98 @@ public class McNetAddressParse : IMcNetAddressParse
             return new byte[0];
         }
         var result = address.Substring(startSplit);
-        var a = result.ToArray();
-        Array.Reverse(a);
-        string value = "";
-        foreach (var item in a)
-        {
-            value += item;
-        }
-        var resultValue = BitConverter.GetBytes(short.Parse(value));
-        if (BitConverter.IsLittleEndian)
-        {
-            Array.Reverse(resultValue);
-        }
-        return resultValue;
+        var resultValue = BitConverter.GetBytes(Convert.ToUInt32(result, 16));
+        byte[] threeBytes = new byte[3];
+        Array.Copy(resultValue, 0, threeBytes, 0, 2); // 只取第1到第3个字节
+        //if (BitConverter.IsLittleEndian)
+        //{
+        //    Array.Reverse(threeBytes);
+        //}
+        return threeBytes;
     }
 
-    public byte[] GetLength(short length)
+    public byte[] GetLength(MitsubishiMCType type, ushort length)
     {
-        var lengthValue = BitConverter.GetBytes(length);
-        return lengthValue;
+        var bytes = BitConverter.GetBytes(length);
+        return bytes;
+    }
+
+    /// <summary>
+    /// 获取标识是否是位操作
+    /// </summary>
+    /// <param name="address"></param>
+    /// <returns></returns>
+    public bool? IsWordType(string address)
+    {
+        if (address.Length == 0)
+            return null;
+        string type = address.Substring(0, 1);
+        switch (type.ToUpper())
+        {
+            case "X":
+            case "Y":
+            case "M":
+            case "L":
+            case "B":
+            case "S":
+            case "F":
+                return false;
+            case "T":
+                type = address.Substring(0, 2);
+                if (type == "TS")
+                    return false;
+                else if (type == "TC")
+                    return false;
+                else if (type == "TN")
+                    return true;
+                else
+                    return null;
+            case "C":
+                type = address.Substring(0, 2);
+                if (type == "CS")
+                    return false;
+                else if (type == "CC")
+                    return false;
+                else if (type == "CN")
+                    return true;
+                return null;
+            case "D":
+            case "W":
+            case "R":
+                return true;
+        }
+        return null;
+    }
+
+    public bool? IsWordType(MitsubishiMCType type)
+    {
+        switch (type)
+        {
+            case MitsubishiMCType.None:
+                return null;
+            case MitsubishiMCType.X:
+            case MitsubishiMCType.Y:
+            case MitsubishiMCType.M:
+            case MitsubishiMCType.L:
+            case MitsubishiMCType.S:
+            case MitsubishiMCType.B:
+            case MitsubishiMCType.F:
+            case MitsubishiMCType.TS:
+            case MitsubishiMCType.TC:
+                return false;
+            case MitsubishiMCType.TN:
+                return true;
+            case MitsubishiMCType.CS:
+            case MitsubishiMCType.CC:
+                return false;
+            case MitsubishiMCType.CN:
+                return true;
+            case MitsubishiMCType.D:
+            case MitsubishiMCType.W:
+            case MitsubishiMCType.R:
+                return true;
+            default:
+                return false;
+        }
     }
 }

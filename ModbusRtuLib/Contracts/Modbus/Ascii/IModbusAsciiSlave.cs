@@ -130,6 +130,9 @@ namespace ModbusRtuLib.Contracts.Modbus.Ascii
 
         public Task<DataResult<double>> ReadDoubleAsync(ushort start);
 
+        public Task<DataResult<bool>> WriteInt64Async(ushort start, long value);
+
+        public Task<DataResult<bool>> WriteFloatAsync(ushort start, float value);
         #endregion
 
         #region 基础

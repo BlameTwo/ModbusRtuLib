@@ -26,6 +26,17 @@ partial class ModbusSerialPortViewModel
                 AddMessage(result);
                 break;
             case Models.ModbusRunType.Ascii:
+                if (asciiClient == null)
+                {
+                    return;
+                }
+                var ascResult = await asciiClient
+                    .GetSlave((byte)SlaveDevice)
+                    .WriteSingleCoilAsync(
+                        Convert.ToUInt16(StartPostion),
+                        Convert.ToBoolean(WriteData)
+                    );
+                AddMessage(ascResult);
                 break;
             default:
                 break;
@@ -48,6 +59,14 @@ partial class ModbusSerialPortViewModel
                 AddMessage(result);
                 break;
             case Models.ModbusRunType.Ascii:
+                if (asciiClient == null)
+                {
+                    return;
+                }
+                var ascResult = await asciiClient
+                    .GetSlave((byte)SlaveDevice)
+                    .WriteInt16Async(Convert.ToUInt16(StartPostion), Convert.ToInt16(WriteData));
+                AddMessage(ascResult);
                 break;
             default:
                 break;
@@ -64,12 +83,20 @@ partial class ModbusSerialPortViewModel
                 {
                     return;
                 }
-                var result = await rtuClient
+                var rtuResult = await rtuClient
                     .GetSlave((byte)SlaveDevice)
                     .WriteInt32Async(Convert.ToUInt16(StartPostion), Convert.ToInt32(WriteData));
-                AddMessage(result);
+                AddMessage(rtuResult);
                 break;
             case Models.ModbusRunType.Ascii:
+                if (asciiClient == null)
+                {
+                    return;
+                }
+                var ascResult = await asciiClient
+                    .GetSlave((byte)SlaveDevice)
+                    .WriteInt32Async(Convert.ToUInt16(StartPostion), Convert.ToInt32(WriteData));
+                AddMessage(ascResult);
                 break;
             default:
                 break;
@@ -92,6 +119,14 @@ partial class ModbusSerialPortViewModel
                 AddMessage(result);
                 break;
             case Models.ModbusRunType.Ascii:
+                if (asciiClient == null)
+                {
+                    return;
+                }
+                var ascResult = await asciiClient
+                    .GetSlave((byte)SlaveDevice)
+                    .WriteInt64Async(Convert.ToUInt16(StartPostion), Convert.ToInt64(WriteData));
+                AddMessage(ascResult);
                 break;
             default:
                 break;
@@ -114,6 +149,14 @@ partial class ModbusSerialPortViewModel
                 AddMessage(result);
                 break;
             case Models.ModbusRunType.Ascii:
+                if (asciiClient == null)
+                {
+                    return;
+                }
+                var ascResult = await asciiClient
+                    .GetSlave((byte)SlaveDevice)
+                    .WriteFloatAsync(Convert.ToUInt16(StartPostion), Convert.ToSingle(WriteData));
+                AddMessage(ascResult);
                 break;
             default:
                 break;
@@ -136,6 +179,14 @@ partial class ModbusSerialPortViewModel
                 AddMessage(result);
                 break;
             case Models.ModbusRunType.Ascii:
+                if (asciiClient == null)
+                {
+                    return;
+                }
+                var ascResult = await asciiClient
+                    .GetSlave((byte)SlaveDevice)
+                    .WriteDoubleAsync(Convert.ToUInt16(StartPostion), Convert.ToDouble(WriteData));
+                AddMessage(ascResult);
                 break;
             default:
                 break;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ModbusRtuLib.Common;
 using ModbusRtuLib.Models;
@@ -164,6 +166,80 @@ namespace ModbusRtuLib.Services.Ascii
         public async Task<DataResult<double>> ReadDoubleAsync(ushort start)
         {
             return await Task.Factory.StartNew(() => this.ReadDouble(start));
+        }
+
+        public async Task<DataResult<bool>> WriteInt64Async(ushort start, long value)
+        {
+            var bytes = await this.WriteHoldingRegistersAsync(
+                start,
+                2,
+                ByteConvert.ToLong([value], Config.DataFormat)
+            );
+            if (bytes[0] == this.Config.SlaveId && bytes[1] == 0x10)
+            {
+                return DataResult<bool>.OK(true);
+            }
+            return DataResult<bool>.NG("写入功能码与站号不同！");
+        }
+
+        public async Task<byte[]> WriteHoldingRegistersAsync(
+            ushort start,
+            ushort length,
+            params byte[] value
+        )
+        {
+            var bytes = await WriteDatasAsync(start, value);
+            return bytes;
+        }
+
+        public async Task<byte[]> WriteDatasAsync(ushort start, params byte[] data)
+        {
+            List<byte> writeByte = new();
+            writeByte.Add(0x3A);
+            writeByte.Add(this.Config.SlaveId);
+            writeByte.Add(0x10);
+            writeByte.AddRange(ByteConvert.GetStartBytes(start));
+            writeByte.AddRange(ByteConvert.GetLength((ushort)(data.Length / 2)));
+            writeByte.Add((byte)data.Length);
+            writeByte.AddRange(data);
+            var lrc = LRC.LRCCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
+            writeByte.Add(lrc);
+            List<string> sendValue = new List<string>();
+            foreach (var item in writeByte)
+            {
+                if (item == 0x3A)
+                {
+                    sendValue.Add(":");
+                    continue;
+                }
+                sendValue.Add(item.ToString("X2"));
+            }
+            var strResult = string.Join("", sendValue);
+            var aa = Encoding.ASCII.GetBytes(strResult);
+            List<byte> finalBytes = new List<byte>(aa);
+            finalBytes.Add(0x0D);
+            finalBytes.Add(0x0A);
+            await SerialPort.BaseStream.WriteAsync(finalBytes.ToArray(), 0, finalBytes.Count);
+            Thread.Sleep(Config.ReadTimeSpan);
+            var count = SerialPort.BytesToRead;
+            var resultByte = new byte[count];
+            await SerialPort.BaseStream.ReadAsync(resultByte, 0, count);
+            var resultString = GetAsciiByte(Encoding.ASCII.GetString(resultByte));
+            return resultString;
+        }
+
+        public async Task<DataResult<bool>> WriteFloatAsync(ushort start, float value)
+        {
+            var write = await this.WriteHoldingRegistersAsync(
+                start,
+                2,
+                ByteConvert.ToFloat([value], Config.DataFormat)
+            );
+            if (write[0] == this.Config.SlaveId && write[1] == 0x10)
+            {
+                return DataResult<bool>.OK(true);
+            }
+            return DataResult<bool>.NG("写入功能码与站号不同！");
         }
     }
 }
