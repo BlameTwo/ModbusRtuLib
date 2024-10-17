@@ -2,11 +2,13 @@
 using System.Collections.ObjectModel;
 using System.IO.Ports;
 using CommunicationApp.Common;
+using CommunicationApp.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
 using ModbusRtuLib.Contracts.Mitsubishi;
+using ModbusRtuLib.Models;
 using ModbusRtuLib.Services.Mitsubishi;
 
 namespace CommunicationApp.ViewModels.MitsubishiViewModels;
@@ -74,6 +76,9 @@ public sealed partial class McNetQna3EViewModel : ObservableObject
     [ObservableProperty]
     Parity _selectParity = Parity.None;
 
+    [ObservableProperty]
+    ObservableCollection<ModbusMessage> modbusMessages = new ObservableCollection<ModbusMessage>();
+
     [RelayCommand]
     void Start()
     {
@@ -118,5 +123,30 @@ public sealed partial class McNetQna3EViewModel : ObservableObject
         if (mcNetSerialPort != null)
             mcNetSerialPort.Dispose();
         EnableStart = true;
+    }
+
+    public void AddMessage<T>(DataResult<T> result)
+    {
+        ModbusMessages.Add(
+            new Models.ModbusMessage()
+            {
+                Type = Models.ModbusMessageType.Rx,
+                Datas = result.OrginSend,
+            }
+        );
+        ModbusMessages.Add(
+            new Models.ModbusMessage()
+            {
+                Type = Models.ModbusMessageType.Tx,
+                Datas = result.ReceivedData,
+            }
+        );
+        ModbusMessages.Add(
+            new Models.ModbusMessage()
+            {
+                Value = result.Data.ToString(),
+                Type = Models.ModbusMessageType.Data,
+            }
+        );
     }
 }

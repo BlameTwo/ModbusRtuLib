@@ -6,14 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:CommunicationApp.Views.ModbusView"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:CommunicationApp.Models"
     Margin="15"
     mc:Ignorable="d">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid
@@ -21,7 +21,7 @@
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="1"
-            CornerRadius="5">
+            CornerRadius="5 5 0 0">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -188,8 +188,119 @@
         </Grid>
         <Grid
             Grid.Row="1"
+            Padding="10"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1" />
+            BorderThickness="1"
+            CornerRadius="0 0 5 5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBox
+                Width="130"
+                PlaceholderText="Start"
+                Text="{x:Bind ViewModel.Postion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            <DropDownButton
+                Grid.Column="1"
+                Margin="5,0,0,0"
+                Content="Read">
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadBitCommand}" Text="Bit" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadInt16Command}" Text="Int16" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadInt32Command}" Text="Int32" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadFloatCommand}" Text="Float" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadDoubleCommand}" Text="Double" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.ReadInt64Command}" Text="Int64" />
+                    </MenuFlyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+            <TextBox
+                Grid.Column="2"
+                Width="120"
+                Margin="5,0,0,0"
+                PlaceholderText="WriteValue"
+                Text="{x:Bind ViewModel.ValueData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            <DropDownButton
+                Grid.Column="3"
+                Margin="5,0,0,0"
+                Content="Write">
+                <DropDownButton.Flyout>
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WriteBitCommand}" Text="Bit" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WriteInt16Command}" Text="Int16" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WriteInt32Command}" Text="Int32" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WriteInt64Command}" Text="Int64" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WriteFloatCommand}" Text="Float" />
+                        <MenuFlyoutItem Command="{x:Bind ViewModel.WriteDoubleCommand}" Text="Double" />
+                    </MenuFlyout>
+                </DropDownButton.Flyout>
+            </DropDownButton>
+            <StackPanel
+                Grid.Column="4"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Padding="4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Style="{ThemeResource TransparentButtonStyle}">
+                    <FontIcon
+                        FontFamily="Segoe Fluent Icons"
+                        FontSize="15"
+                        Glyph="&#xE897;" />
+                </Button>
+                <Button
+                    Margin="5,0,0,0"
+                    Padding="4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Style="{ThemeResource TransparentButtonStyle}">
+                    <FontIcon
+                        FontFamily="Segoe Fluent Icons"
+                        FontSize="15"
+                        Glyph="&#xE894;" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <ListView
+            Grid.Row="2"
+            Margin="0,5,0,0"
+            ItemsSource="{x:Bind ViewModel.ModbusMessages, Mode=OneWay}">
+            <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <AddDeleteThemeTransition />
+                    <EntranceThemeTransition IsStaggeringEnabled="True" />
+                </TransitionCollection>
+            </ListView.ItemContainerTransitions>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="model:ModbusMessage">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            Foreground="{ThemeResource AccentAAFillColorDefaultBrush}"
+                            Text="{x:Bind Type}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="20,0,0,0"
+                            Text="{x:Bind Value}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            Text="{x:Bind Time}" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Page>

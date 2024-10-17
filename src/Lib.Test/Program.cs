@@ -16,9 +16,10 @@
 //    })
 //    .BuildServiceProvider();
 //var rtu = Service.GetService<IModbusAsciiClient>()!.GetSlave(1).ReadDouble(0x0000);
+using ModbusRtuLib.Contracts.Mitsubishi;
 using ModbusRtuLib.Services.Mitsubishi;
 
-McNetSerialPort mcnet = new McNetSerialPort();
+IMcNetSerialPort mcnet = new McNetSerialPort();
 mcnet.OpenSerial(
     new ModbusRtuLib.Models.SerialPortConfig()
     {
@@ -29,7 +30,4 @@ mcnet.OpenSerial(
         StopBit = System.IO.Ports.StopBits.One,
     }
 );
-
-var result = mcnet.Write(12343, "D100");
-var read = mcnet.ReadInt32("D100");
 Console.ReadKey();

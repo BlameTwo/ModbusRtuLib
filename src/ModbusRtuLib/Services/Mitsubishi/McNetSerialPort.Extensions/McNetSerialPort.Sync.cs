@@ -14,7 +14,7 @@ public partial class McNetSerialPort
         List<byte> Resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
-        if (length > 1)
+        if (length >= 1)
         {
             dataBytes.AddRange([0x00, 0x01]);
             dataBytes.AddRange([0x14, 0x00]);
@@ -111,13 +111,18 @@ public partial class McNetSerialPort
         return this.Write(address, BitConverter.GetBytes(value), sizeof(long) / 2);
     }
 
+    public DataResult<bool> Write(short value, string address)
+    {
+        return this.Write(address, BitConverter.GetBytes(value), 1);
+    }
+
     public DataResult<byte[]> Read(string address, ushort length)
     {
         List<byte> Resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         var method = Parse.GetMcType(address);
-        if (Parse.IsWordType(method) == true)
+        if (length <= 1)
         {
             dataBytes.AddRange([0x00, 0x01, 0x04, 0x00]);
         }
@@ -158,6 +163,54 @@ public partial class McNetSerialPort
             return DataResult<int>.OK(BitConverter.ToInt32(formatData), result.OrginSend, data);
         }
         return DataResult<int>.NG(message);
+    }
+
+    public DataResult<float> ReadFloat(string address)
+    {
+        var result = this.Read(address, 0x02);
+        byte[] data = new byte[result.ReceivedData.Length];
+        result.ReceivedData.CopyTo(data, 0);
+        if (CheckData(data, out var formatData, out var message))
+        {
+            return DataResult<float>.OK(BitConverter.ToSingle(formatData), result.OrginSend, data);
+        }
+        return DataResult<float>.NG(message);
+    }
+
+    public DataResult<double> ReadDouble(string address)
+    {
+        var result = this.Read(address, 0x04);
+        byte[] data = new byte[result.ReceivedData.Length];
+        result.ReceivedData.CopyTo(data, 0);
+        if (CheckData(data, out var formatData, out var message))
+        {
+            return DataResult<double>.OK(BitConverter.ToDouble(formatData), result.OrginSend, data);
+        }
+        return DataResult<double>.NG(message);
+    }
+
+    public DataResult<long> ReadInt64(string address)
+    {
+        var result = this.Read(address, 0x04);
+        byte[] data = new byte[result.ReceivedData.Length];
+        result.ReceivedData.CopyTo(data, 0);
+        if (CheckData(data, out var formatData, out var message))
+        {
+            return DataResult<long>.OK(BitConverter.ToInt64(formatData), result.OrginSend, data);
+        }
+        return DataResult<long>.NG(message);
+    }
+
+    public DataResult<short> ReadInt16(string address)
+    {
+        var result = this.Read(address, 0x01);
+        byte[] data = new byte[result.ReceivedData.Length];
+        result.ReceivedData.CopyTo(data, 0);
+        if (CheckData(data, out var formatData, out var message))
+        {
+            return DataResult<short>.OK(BitConverter.ToInt16(formatData), result.OrginSend, data);
+        }
+        return DataResult<short>.NG(message);
     }
 
     private bool CheckData(byte[] data, out byte[] dataResult, out string messageData)

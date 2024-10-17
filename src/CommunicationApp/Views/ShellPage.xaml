@@ -26,7 +26,8 @@
             Grid.RowSpan="2"
             Opacity="0.5"
             Source="ms-appx:///Assets/background.png"
-            Stretch="UniformToFill" Visibility="Collapsed" />
+            Stretch="UniformToFill"
+            Visibility="Collapsed" />
         <ui:TitleBar
             x:Name="titleBar"
             HorizontalContentAlignment="Center"
@@ -65,7 +66,7 @@
                         VerticalAlignment="Center"
                         Click="Button_Click"
                         Style="{ThemeResource TransparentButtonStyle}"
-                        Visibility="Collapsed">
+                        Visibility="Visible">
                         <AnimatedIcon
                             x:Name="AnimatedIcon"
                             Width="15"
@@ -86,17 +87,20 @@
             IsPaneToggleButtonVisible="False"
             IsSettingsVisible="False"
             IsTitleBarAutoPaddingEnabled="True"
-            PaneDisplayMode="Top"
+            OpenPaneLength="300"
             SelectedItem="{x:Bind ViewModel.SelectItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Modbus">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe UI Emoji" Glyph="&#x2603;" />
+                    </NavigationViewItem.Icon>
                     <NavigationViewItem.MenuItems>
                         <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.ModbusViewModels.ModbusSerialPortViewModel" Content="SerialPort">
                             <NavigationViewItem.Icon>
                                 <FontIcon FontFamily="FluentSystemIcons-Filled" Glyph="&#xEB7B;" />
                             </NavigationViewItem.Icon>
                         </NavigationViewItem>
-                        <NavigationViewItem Content="Tcp">
+                        <NavigationViewItem Content="Tcp" IsEnabled="False">
                             <NavigationViewItem.Icon>
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEC05;" />
                             </NavigationViewItem.Icon>
@@ -104,25 +108,25 @@
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
                 <NavigationViewItem Content="Mitsubishi">
+                    <NavigationViewItem.Icon>
+                        <FontIcon FontFamily="Segoe UI Emoji" Glyph="&#x1F326;" />
+                    </NavigationViewItem.Icon>
                     <NavigationViewItem.MenuItems>
                         <NavigationViewItem Content="Qna3E SerialPort">
                             <NavigationViewItem.MenuItems>
                                 <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.MitsubishiViewModels.McNetQna3EViewModel" Content="Binary" />
-                                <NavigationViewItem Content="ASCII" />
+                                <NavigationViewItem Content="ASCII" IsEnabled="False" />
                             </NavigationViewItem.MenuItems>
                         </NavigationViewItem>
                         <NavigationViewItem Content="Qna3E Tcp">
                             <NavigationViewItem.MenuItems>
-                                <NavigationViewItem Content="Binary" />
-                                <NavigationViewItem Content="ASCII" />
+                                <NavigationViewItem Content="Binary" IsEnabled="False" />
+                                <NavigationViewItem Content="ASCII" IsEnabled="False" />
                             </NavigationViewItem.MenuItems>
                         </NavigationViewItem>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
-            <NavigationView.PaneFooter>
-                <Button Content="Help" />
-            </NavigationView.PaneFooter>
             <Frame x:Name="frame" />
         </NavigationView>
     </Grid>

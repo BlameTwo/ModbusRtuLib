@@ -1,11 +1,13 @@
 ﻿using CommunicationApp.Contracts;
+using CommunicationApp.Models.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CommunicationApp.ViewModels;
 
-public sealed partial class ShellViewModel : ObservableRecipient
+public sealed partial class ShellViewModel : ObservableRecipient, IRecipient<HomeItemInvoke>
 {
     public ShellViewModel(
         [FromKeyedServices(ProgramLife.ShellNavigationKey)]
@@ -17,6 +19,7 @@ public sealed partial class ShellViewModel : ObservableRecipient
         ShellNavigationService = shellNavigationService;
         ShellNavigationViewService = shellNavigationViewService;
         ShellNavigationService.Navigated += ShellNavigationService_Navigated;
+        this.IsActive = true;
     }
 
     private void ShellNavigationService_Navigated(
@@ -47,5 +50,10 @@ public sealed partial class ShellViewModel : ObservableRecipient
     void GoBack()
     {
         this.ShellNavigationService.GoBack();
+    }
+
+    public void Receive(HomeItemInvoke message)
+    {
+        this.ShellNavigationService.NavigationTo(message.key.FullName, null);
     }
 }

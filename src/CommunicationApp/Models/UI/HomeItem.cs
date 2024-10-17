@@ -1,4 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media;
 
 namespace CommunicationApp.Models.UI;
@@ -11,12 +14,21 @@ public partial class HomeItem : ObservableObject
     [ObservableProperty]
     FontFamily fontFamily = new FontFamily("Segoe Fluent Icons");
 
-    public HomeItem(string icon, string title, string description = null)
+    public HomeItem(string icon, string title, string description, Type pageKey)
     {
         Icon = icon;
         Title = title;
         Description = description;
+        PageKey = pageKey;
     }
+
+    [RelayCommand]
+    void NavigationTo()
+    {
+        WeakReferenceMessenger.Default.Send(new HomeItemInvoke(this.PageKey));
+    }
+
+    public Type PageKey { get; set; }
 
     [ObservableProperty]
     public string title;
@@ -24,3 +36,5 @@ public partial class HomeItem : ObservableObject
     [ObservableProperty]
     public string description;
 }
+
+public record HomeItemInvoke(Type key);

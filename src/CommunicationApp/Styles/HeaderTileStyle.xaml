@@ -28,11 +28,13 @@
             <Setter.Value>
                 <ControlTemplate TargetType="local:HeaderTile">
                     <HyperlinkButton
+                        x:Name="button"
                         Padding="-1"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         HorizontalContentAlignment="Stretch"
                         VerticalContentAlignment="Stretch"
+                        Command="{TemplateBinding InvokeCommand}"
                         CornerRadius="{StaticResource OverlayCornerRadius}">
                         <Grid VerticalAlignment="Stretch" RowSpacing="16">
                             <Grid.RowDefinitions>
