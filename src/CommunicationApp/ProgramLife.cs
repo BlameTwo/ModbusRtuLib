@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CommunicationApp.Contracts;
 using CommunicationApp.Contracts.Services;
 using CommunicationApp.ViewModels;
+using CommunicationApp.ViewModels.MitsubishiViewModels;
 using CommunicationApp.ViewModels.ModbusViewModels;
 using CommunicationApp.Views;
 using CommunicationApp.Views.ModbusView;
@@ -30,11 +31,12 @@ namespace CommunicationApp
                 )
                 .AddTransient<IPageService, PageService>()
                 #endregion
-                #region Viwe And ViewModel
+                #region View And ViewModel
                 .AddTransient<ShellPage>()
                 .AddTransient<ShellViewModel>()
                 .AddTransient<HomeViewModel>()
                 .AddTransient<ModbusSerialPortViewModel>()
+                .AddTransient<McNetQna3EViewModel>()
                 #endregion
                 .BuildServiceProvider();
         }

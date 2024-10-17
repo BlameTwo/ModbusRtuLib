@@ -22,6 +22,11 @@
             <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
+        <Image
+            Grid.RowSpan="2"
+            Opacity="0.5"
+            Source="ms-appx:///Assets/background.png"
+            Stretch="UniformToFill" Visibility="Collapsed" />
         <ui:TitleBar
             x:Name="titleBar"
             HorizontalContentAlignment="Center"
@@ -102,7 +107,7 @@
                     <NavigationViewItem.MenuItems>
                         <NavigationViewItem Content="Qna3E SerialPort">
                             <NavigationViewItem.MenuItems>
-                                <NavigationViewItem Content="Binary" />
+                                <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.MitsubishiViewModels.McNetQna3EViewModel" Content="Binary" />
                                 <NavigationViewItem Content="ASCII" />
                             </NavigationViewItem.MenuItems>
                         </NavigationViewItem>
@@ -116,7 +121,7 @@
                 </NavigationViewItem>
             </NavigationView.MenuItems>
             <NavigationView.PaneFooter>
-                <Button Content="帮助" />
+                <Button Content="Help" />
             </NavigationView.PaneFooter>
             <Frame x:Name="frame" />
         </NavigationView>

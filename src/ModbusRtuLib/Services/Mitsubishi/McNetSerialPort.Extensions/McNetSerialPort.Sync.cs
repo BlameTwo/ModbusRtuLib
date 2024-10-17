@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using ModbusRtuLib.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ModbusRtuLib.Services.Mitsubishi;
 
@@ -10,23 +12,26 @@ public partial class McNetSerialPort
     public DataResult<bool> Write(string address, byte[] data, ushort length)
     {
         List<byte> Resultbytes = GetHeader();
-        //后续数据长度
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         if (length > 1)
         {
-            dataBytes.AddRange(new byte[] { 0x00, 0x01 });
-            dataBytes.AddRange(new byte[] { 0x14, 0x00 });
+            dataBytes.AddRange([0x00, 0x01]);
+            dataBytes.AddRange([0x14, 0x00]);
         }
         else
         {
-            dataBytes.AddRange(new byte[] { 0x00, 0x01 });
-            dataBytes.AddRange(new byte[] { 0x14, 0x01 });
+            dataBytes.AddRange([0x00, 0x01]);
+            dataBytes.AddRange([0x14, 0x01]);
         }
-
-        dataBytes.AddRange(new byte[] { 0x00 });
+        dataBytes.AddRange([0x00]);
         dataBytes.AddRange(Parse.GetStart(address, 1));
         var method = Parse.GetMcType(address);
+        var isWord = Parse.IsWordType(method);
+        if (length > 1 && isWord == false)
+        {
+            return DataResult<bool>.NG("该寄存器无法写入当前字节大小");
+        }
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
         dataBytes.AddRange(data);
@@ -40,8 +45,8 @@ public partial class McNetSerialPort
         if (
             resultByte[0] == 0xD0
             && resultByte[2] == this.NetWorkId
-            && resultByte[4] == 0xFF
-            && resultByte[5] == 0x03
+            && resultByte[4] == DeviceCode[0]
+            && resultByte[5] == DeviceCode[1]
         )
         {
             return DataResult<bool>.OK(true, Resultbytes.ToArray(), resultByte);
@@ -89,5 +94,95 @@ public partial class McNetSerialPort
     public DataResult<bool> Write(double value, string address)
     {
         return this.Write(address, BitConverter.GetBytes(value), 0x04);
+    }
+
+    public DataResult<bool> Write(float value, string address)
+    {
+        return this.Write(address, BitConverter.GetBytes(value), sizeof(float) / 2);
+    }
+
+    public DataResult<bool> Write(int value, string address)
+    {
+        return this.Write(address, BitConverter.GetBytes(value), sizeof(int) / 2);
+    }
+
+    public DataResult<bool> Write(long value, string address)
+    {
+        return this.Write(address, BitConverter.GetBytes(value), sizeof(long) / 2);
+    }
+
+    public DataResult<byte[]> Read(string address, ushort length)
+    {
+        List<byte> Resultbytes = GetHeader();
+        var dataBytes = new List<byte>();
+        dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
+        var method = Parse.GetMcType(address);
+        if (Parse.IsWordType(method) == true)
+        {
+            dataBytes.AddRange([0x00, 0x01, 0x04, 0x00]);
+        }
+        else
+        {
+            dataBytes.AddRange([0x00, 0x01, 0x04, 0x01]);
+        }
+        dataBytes.AddRange([0x00]);
+        dataBytes.AddRange(Parse.GetStart(address, 1));
+        dataBytes.Add((byte)method);
+        dataBytes.AddRange(Parse.GetLength(method, length));
+        Resultbytes.Add((byte)dataBytes.Count);
+        Resultbytes.AddRange(dataBytes);
+        this.Port.Write(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        Thread.Sleep(TimeSpan);
+        var count = Port.BytesToRead;
+        var resultByte = new byte[count];
+        Port.Read(resultByte, 0, count);
+        if (
+            resultByte[0] == 0xD0
+            && resultByte[2] == this.NetWorkId
+            && resultByte[4] == DeviceCode[0]
+            && resultByte[5] == DeviceCode[1]
+        )
+        {
+            return DataResult<byte[]>.OK(resultByte, Resultbytes.ToArray(), resultByte);
+        }
+        return DataResult<byte[]>.NG("写入失败！");
+    }
+
+    public DataResult<int> ReadInt32(string address)
+    {
+        var result = this.Read(address, 0x02);
+        byte[] data = new byte[result.ReceivedData.Length];
+        result.ReceivedData.CopyTo(data, 0);
+        if (CheckData(data, out var formatData, out var message))
+        {
+            return DataResult<int>.OK(BitConverter.ToInt32(formatData), result.OrginSend, data);
+        }
+        return DataResult<int>.NG(message);
+    }
+
+    private bool CheckData(byte[] data, out byte[] dataResult, out string messageData)
+    {
+        if (!(data[0] == 0xD0 && data[1] == 0x00))
+        {
+            messageData = "数据返回头出错";
+            dataResult = null;
+            return false;
+        }
+        if (!(data[2] == this.NetWorkId && data[4] == 0xff && data[5] == 0x03))
+        {
+            messageData = "数据返回头出错";
+            dataResult = null;
+            return false;
+        }
+        byte[] length = new byte[2];
+        Array.Copy(data, 6, length, 0, 2);
+        Array.Reverse(length);
+        var Spiltlength = BitConverter.ToInt16(length, 0);
+        byte[] resultData = new byte[Spiltlength];
+        Array.Copy(data, 7 + 2, resultData, 0, Spiltlength);
+        var d = resultData.Skip(2).ToArray();
+        dataResult = d;
+        messageData = "无错误";
+        return true;
     }
 }

@@ -27,10 +27,13 @@
     <Compile Remove="Views\ModbusView\ModbusAsciiView.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\background.png" />
     <None Remove="MainWindow.xaml" />
     <None Remove="Styles\Button.xaml" />
+    <None Remove="Styles\HeaderTileStyle.xaml" />
     <None Remove="Styles\TitleBar.xaml" />
     <None Remove="Views\HomePage.xaml" />
+    <None Remove="Views\ModbusView\McNetQna3EPage.xaml" />
     <None Remove="Views\ModbusView\ModbusSerialPortViewPage.xaml" />
     <None Remove="Views\ShellPage.xaml" />
   </ItemGroup>
@@ -70,6 +73,11 @@
     <ProjectReference Include="..\ModbusRtuLib\ModbusRtuLib.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\ModbusView\McNetQna3EPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\HomePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -91,6 +99,19 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\ModbusView\ModbusSerialPortViewPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\MitsubishiView\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Assets\background.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Styles\HeaderTileStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

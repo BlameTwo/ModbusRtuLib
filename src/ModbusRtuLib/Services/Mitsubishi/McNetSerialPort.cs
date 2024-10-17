@@ -3,16 +3,29 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using ModbusRtuLib.Contracts.Mitsubishi;
 using ModbusRtuLib.Models;
+using ModbusRtuLib.Models.Handlers;
 
 namespace ModbusRtuLib.Services.Mitsubishi;
 
 public partial class McNetSerialPort : IMcNetSerialPort
 {
+    private bool disposedValue;
+
+    public event MitsubishiQna3EConnectChanged ConnectChanged
+    {
+        add => mitsubishiQna3EHandler += value;
+        remove => mitsubishiQna3EHandler -= value;
+    }
+
+    public MitsubishiQna3EConnectChanged mitsubishiQna3EHandler;
+
     public IMcNetAddressParse Parse => new McNetAddressParse();
 
     public byte NetWorkId { get; set; } = 0x00;
 
     public byte NetWorkSlave { get; set; } = 0x00;
+
+    public bool IsConnected { get; private set; }
 
     public int TimeSpan { get; set; } = 100;
 
@@ -31,14 +44,55 @@ public partial class McNetSerialPort : IMcNetSerialPort
             Port.Parity = serialPortConfig.Parity;
             Port.Open();
             if (Port.IsOpen)
+            {
+                this.IsConnected = Port.IsOpen;
+                this.mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
                 return DataResult<bool>.OK(true);
+            }
+            else
+            {
+                this.IsConnected = Port.IsOpen;
+                this.mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
+                return DataResult<bool>.NG("open error");
+            }
         }
         catch (Exception ex)
         {
+            this.IsConnected = Port.IsOpen;
+            this.mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
             return DataResult<bool>.NG(ex.Message);
         }
-        return DataResult<bool>.NG("打开失败！");
     }
 
     public List<byte> GetHeader() => [0x50, 0x00, NetWorkId, 0xFF, .. DeviceCode, NetWorkSlave];
+
+    public void Close()
+    {
+        this.Port.Close();
+        this.mitsubishiQna3EHandler?.Invoke(this, false);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                if (this.Port != null)
+                {
+                    this.Close();
+                    this.Port.Dispose();
+                }
+            }
+
+            disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 }

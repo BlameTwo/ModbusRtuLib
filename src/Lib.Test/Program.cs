@@ -30,9 +30,6 @@ mcnet.OpenSerial(
     }
 );
 
-//var result = mcnet.ReadBit("X1A0");
-var write = mcnet.WriteBit("B1A0", false);
-var read = mcnet.ReadBit("B1A0");
-Console.WriteLine(write.Data);
-Console.WriteLine(read.Data);
+var result = mcnet.Write(12343, "D100");
+var read = mcnet.ReadInt32("D100");
 Console.ReadKey();

@@ -9,6 +9,8 @@ public interface IMcNetAddressParse
     public bool? IsWordType(string address);
     public bool? IsWordType(MitsubishiMCType type);
 
+    public bool? IsHexType(MitsubishiMCType type);
+
     public byte[] GetStart(string address, int startSplit);
 
     public byte[] GetLength(MitsubishiMCType type, ushort length);

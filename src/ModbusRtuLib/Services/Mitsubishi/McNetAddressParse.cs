@@ -75,13 +75,18 @@ public class McNetAddressParse : IMcNetAddressParse
             return new byte[0];
         }
         var result = address.Substring(startSplit);
-        var resultValue = BitConverter.GetBytes(Convert.ToUInt32(result, 16));
+        var method = this.GetMcType(address);
+        byte[] resultValue = null;
+        if (this.IsHexType(method) == true)
+        {
+            resultValue = BitConverter.GetBytes(Convert.ToUInt32(result, 16));
+        }
+        else
+        {
+            resultValue = BitConverter.GetBytes(int.Parse(result));
+        }
         byte[] threeBytes = new byte[3];
         Array.Copy(resultValue, 0, threeBytes, 0, 2); // 只取第1到第3个字节
-        //if (BitConverter.IsLittleEndian)
-        //{
-        //    Array.Reverse(threeBytes);
-        //}
         return threeBytes;
     }
 
@@ -168,5 +173,33 @@ public class McNetAddressParse : IMcNetAddressParse
             default:
                 return false;
         }
+    }
+
+    public bool? IsHexType(MitsubishiMCType type)
+    {
+        switch (type)
+        {
+            case MitsubishiMCType.None:
+                break;
+            case MitsubishiMCType.X:
+            case MitsubishiMCType.Y:
+            case MitsubishiMCType.M:
+            case MitsubishiMCType.L:
+            case MitsubishiMCType.B:
+            case MitsubishiMCType.W:
+            case MitsubishiMCType.S:
+            case MitsubishiMCType.F:
+            case MitsubishiMCType.TS:
+            case MitsubishiMCType.TC:
+            case MitsubishiMCType.TN:
+            case MitsubishiMCType.CS:
+            case MitsubishiMCType.CC:
+            case MitsubishiMCType.CN:
+            case MitsubishiMCType.R:
+                return true;
+            case MitsubishiMCType.D:
+                return false;
+        }
+        return null;
     }
 }

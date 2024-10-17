@@ -6,10 +6,42 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:CommunicationApp.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:CommunicationApp.Models.UI"
+    xmlns:style="using:CommunicationApp.Controls"
     Margin="10"
     mc:Ignorable="d">
+    <ScrollView Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <ScrollView Grid.Row="1">
+                <ItemsRepeater ItemsSource="{x:Bind ViewModel.ModBusItems, Mode=OneWay}">
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="model:HomeItem">
+                            <style:HeaderTile
+                                Title="{x:Bind Title, Mode=OneWay}"
+                                Margin="5"
+                                Description="{x:Bind Description, Mode=OneWay}"
+                                Icon="{x:Bind Icon, Mode=OneWay}"
+                                IconFontFamily="{x:Bind FontFamily, Mode=OneWay}" />
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                    <ItemsRepeater.ItemTransitionProvider>
+                        <LinedFlowLayoutItemCollectionTransitionProvider />
+                    </ItemsRepeater.ItemTransitionProvider>
+                    <ItemsRepeater.Layout>
+                        <UniformGridLayout
+                            ItemsJustification="Start"
+                            ItemsStretch="Uniform"
+                            MinItemHeight="130"
+                            MinItemWidth="200" />
+                    </ItemsRepeater.Layout>
+                </ItemsRepeater>
+            </ScrollView>
 
-    <Grid>
-        <TextBlock Text="Home" />
-    </Grid>
+        </Grid>
+    </ScrollView>
+
 </Page>
