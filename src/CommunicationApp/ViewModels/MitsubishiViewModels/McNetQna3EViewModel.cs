@@ -105,7 +105,7 @@ public sealed partial class McNetQna3EViewModel : ObservableObject
         }
     }
 
-    private void McNetSerialPort_ConnectChanged(IMcNetSerialPort port, bool connect)
+    private void McNetSerialPort_ConnectChanged(object port, bool connect)
     {
         if (connect == true)
         {

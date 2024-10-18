@@ -1,3 +1,4 @@
+using System;
 using CommunicationApp.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -30,6 +31,23 @@ namespace CommunicationApp.Views
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+        }
+
+        private void AutoSuggestBox_TextChanged(
+            AutoSuggestBox sender,
+            AutoSuggestBoxTextChangedEventArgs args
+        )
+        {
+            string userInput = sender.Text;
+
+            ViewModel.SaveItems.Clear();
+            foreach (var item in ViewModel.ModBusItems)
+            {
+                if (item.Title.Contains(userInput, StringComparison.OrdinalIgnoreCase)) // 基于 Title 属性的筛选
+                {
+                    ViewModel.SaveItems.Add(item);
+                }
+            }
         }
     }
 }

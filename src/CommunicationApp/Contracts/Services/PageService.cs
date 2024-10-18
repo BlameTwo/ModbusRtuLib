@@ -20,6 +20,7 @@ public sealed partial class PageService : IPageService
         _pages = new();
         this.RegisterView<ModbusSerialPortViewPage, ModbusSerialPortViewModel>();
         this.RegisterView<McNetQna3EPage, McNetQna3EViewModel>();
+        this.RegisterView<McNetQna3ETcpPage, McNetQna3ETcpViewModel>();
         this.RegisterView<HomePage, HomeViewModel>();
     }
 

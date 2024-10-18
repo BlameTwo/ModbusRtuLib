@@ -28,11 +28,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\background.png" />
+    <None Remove="Assets\Icons\modbus.png" />
     <None Remove="MainWindow.xaml" />
     <None Remove="Styles\Button.xaml" />
     <None Remove="Styles\HeaderTileStyle.xaml" />
     <None Remove="Styles\TitleBar.xaml" />
     <None Remove="Views\HomePage.xaml" />
+    <None Remove="Views\MitsubishiView\McNetQna3ETcpPage.xaml" />
     <None Remove="Views\ModbusView\McNetQna3EPage.xaml" />
     <None Remove="Views\ModbusView\ModbusSerialPortViewPage.xaml" />
     <None Remove="Views\ShellPage.xaml" />
@@ -103,12 +105,17 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\MitsubishiView\" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Update="Assets\background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Assets\Icons\modbus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MitsubishiView\McNetQna3ETcpPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Styles\HeaderTileStyle.xaml">

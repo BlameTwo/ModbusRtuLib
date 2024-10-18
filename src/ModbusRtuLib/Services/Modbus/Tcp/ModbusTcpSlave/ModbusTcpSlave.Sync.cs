@@ -21,13 +21,13 @@ public partial class ModbusTcpSlave
         bytes.AddRange(ByteConvert.GetStartBytes(Convert.ToUInt16(be.Count)));
         bytes.AddRange(be);
         var result = Device.SendData(bytes.ToArray());
-        if (result.Item2 == 0)
+        if (result == null)
             return DataResult<bool>.NG("未读取到任何数据！");
-        if (ByteConvert.GetStart(result.Item1[0], result.Item1[1]) == 0x0002)
+        if (ByteConvert.GetStart(result[0], result[1]) == 0x0002)
         {
-            var getLength = ByteConvert.GetStart(result.Item1[4], result.Item1[5]);
+            var getLength = ByteConvert.GetStart(result[4], result[5]);
             var data = result
-                .Item1.Skip(Math.Max(0, result.Item1.Length - getLength))
+                .Skip(Math.Max(0, result.Length - getLength))
                 .Take(getLength)
                 .ToArray();
             if (data[0] == this.Id && data[1] == 0x01 && data[1] == 0x01)

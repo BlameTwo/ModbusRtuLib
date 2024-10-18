@@ -37,6 +37,7 @@ namespace CommunicationApp
                 .AddTransient<HomeViewModel>()
                 .AddTransient<ModbusSerialPortViewModel>()
                 .AddTransient<McNetQna3EViewModel>()
+                .AddTransient<McNetQna3ETcpViewModel>()
                 #endregion
                 .BuildServiceProvider();
         }

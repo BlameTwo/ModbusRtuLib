@@ -44,7 +44,6 @@
                     </ItemsRepeater.Layout>
                 </ItemsRepeater>
             </ScrollView>
-
         </Grid>
     </ScrollView>
 

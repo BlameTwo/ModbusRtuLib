@@ -3,9 +3,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media;
+using WinRT;
 
 namespace CommunicationApp.Models.UI;
 
+[Windows.UI.Xaml.Data.Bindable]
+[GeneratedBindableCustomPropertyAttribute()]
 public partial class HomeItem : ObservableObject
 {
     [ObservableProperty]

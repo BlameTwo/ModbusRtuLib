@@ -31,6 +31,7 @@ namespace CommunicationApp.ViewModels
                 {
                     FontFamily = new("FluentSystemIcons-Filled"),
                 },
+                new("\uEC05", "Qna3E Tcp", "三菱Qna3ETcp通信示例", typeof(McNetQna3ETcpViewModel)),
                 //new("\uEC05", "Qna3E Tcp", "三菱Qna3E网络通信示例"),
             };
     }

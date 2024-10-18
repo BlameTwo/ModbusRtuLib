@@ -63,6 +63,37 @@ public partial class McNetSerialPort
         return DataResult<bool>.NG("写入失败！");
     }
 
+    public async Task<DataResult<byte[]>> ReadAsync(string address, ushort length)
+    {
+        List<byte> Resultbytes = GetHeader();
+        var dataBytes = new List<byte>();
+        dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
+        var method = Parse.GetMcType(address);
+
+        dataBytes.AddRange([0x00, 0x01, 0x04, 0x00]);
+        dataBytes.AddRange([0x00]);
+        dataBytes.AddRange(Parse.GetStart(address, 1));
+        dataBytes.Add((byte)method);
+        dataBytes.AddRange(Parse.GetLength(method, length));
+        Resultbytes.Add((byte)dataBytes.Count);
+        Resultbytes.AddRange(dataBytes);
+        await this.Port.BaseStream.WriteAsync(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        Thread.Sleep(TimeSpan);
+        var count = Port.BytesToRead;
+        var resultByte = new byte[count];
+        await Port.BaseStream.ReadAsync(resultByte, 0, count);
+        if (
+            resultByte[0] == 0xD0
+            && resultByte[2] == this.NetWorkId
+            && resultByte[4] == DeviceCode[0]
+            && resultByte[5] == DeviceCode[1]
+        )
+        {
+            return DataResult<byte[]>.OK(resultByte, Resultbytes.ToArray(), resultByte);
+        }
+        return DataResult<byte[]>.NG("写入失败！");
+    }
+
     public async Task<DataResult<bool>> WriteAsync(double value, string address)
     {
         return await this.WriteAsync(address, BitConverter.GetBytes(value), 0x04);
@@ -86,44 +117,6 @@ public partial class McNetSerialPort
     public async Task<DataResult<bool>> WriteAsync(short value, string address)
     {
         return await this.WriteAsync(address, BitConverter.GetBytes(value), 1);
-    }
-
-    public async Task<DataResult<byte[]>> ReadAsync(string address, ushort length)
-    {
-        List<byte> Resultbytes = GetHeader();
-        var dataBytes = new List<byte>();
-        dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
-        var method = Parse.GetMcType(address);
-
-        dataBytes.AddRange([0x00, 0x01, 0x04, 0x00]);
-        //if (length <= 1 || (method == Models.Enums.MitsubishiMCType.D))
-        //{
-        //}
-        //else
-        //{
-        //    dataBytes.AddRange([0x00, 0x01, 0x04, 0x01]);
-        //}
-        dataBytes.AddRange([0x00]);
-        dataBytes.AddRange(Parse.GetStart(address, 1));
-        dataBytes.Add((byte)method);
-        dataBytes.AddRange(Parse.GetLength(method, length));
-        Resultbytes.Add((byte)dataBytes.Count);
-        Resultbytes.AddRange(dataBytes);
-        await this.Port.BaseStream.WriteAsync(Resultbytes.ToArray(), 0, Resultbytes.Count);
-        Thread.Sleep(TimeSpan);
-        var count = Port.BytesToRead;
-        var resultByte = new byte[count];
-        await Port.BaseStream.ReadAsync(resultByte, 0, count);
-        if (
-            resultByte[0] == 0xD0
-            && resultByte[2] == this.NetWorkId
-            && resultByte[4] == DeviceCode[0]
-            && resultByte[5] == DeviceCode[1]
-        )
-        {
-            return DataResult<byte[]>.OK(resultByte, Resultbytes.ToArray(), resultByte);
-        }
-        return DataResult<byte[]>.NG("写入失败！");
     }
 
     public async Task<DataResult<int>> ReadInt32Async(string address)

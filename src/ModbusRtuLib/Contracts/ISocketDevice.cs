@@ -11,17 +11,20 @@ namespace ModbusRtuLib.Contracts
     {
         public DataResult<bool> Connect(string ip, int port = 502);
 
-        public bool IsReconnect { get; }
+        public Task<DataResult<bool>> ConnectAsync(string ip, int port = 502);
+
+        public bool IsReconnect { get; set; }
 
         public bool IsConnected { get; }
         public void Disconnect();
 
         public void SendData(string message);
 
-        public (byte[], int) SendData(byte[] message);
+        public byte[] SendData(byte[] message);
 
         public Task SendDataAsync(string message);
 
-        public TcpClient TcpClient { get; }
+        public Task<byte[]> SendDataAsync(byte[] message);
+        public TcpClient Client { get; }
     }
 }

@@ -9,6 +9,7 @@
     xmlns:i="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:CommunicationApp.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:CommunicationApp.Models.UI"
     xmlns:property="using:CommunicationApp.Controls.Propertys"
     xmlns:ui="using:CommunicationApp.Controls"
     mc:Ignorable="d">
@@ -22,12 +23,15 @@
             <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Image
-            Grid.RowSpan="2"
-            Opacity="0.5"
-            Source="ms-appx:///Assets/background.png"
-            Stretch="UniformToFill"
-            Visibility="Collapsed" />
+
+        <Grid Grid.RowSpan="2">
+            <Border Background="{ThemeResource SystemAltHighColor}" />
+            <Image
+                Opacity="0.1"
+                Source="ms-appx:///Assets/background.png"
+                Stretch="UniformToFill"
+                Visibility="Visible" />
+        </Grid>
         <ui:TitleBar
             x:Name="titleBar"
             HorizontalContentAlignment="Center"
@@ -41,7 +45,43 @@
                     Foreground="{ThemeResource SystemColorGrayTextBrush}"
                     Text="通信工具" />
             </ui:TitleBar.Title>
-            <AutoSuggestBox Width="300" QueryIcon="Find" />
+            <AutoSuggestBox
+                Width="400"
+                ItemsSource="{x:Bind ViewModel.SaveItems, Mode=OneWay}"
+                QueryIcon="Find"
+                TextChanged="AutoSuggestBox_TextChanged"
+                TextMemberPath="Title"
+                UpdateTextOnSelect="True">
+                <AutoSuggestBox.ItemTemplate>
+                    <DataTemplate x:DataType="model:HomeItem">
+                        <Grid Padding="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <FontIcon
+                                Grid.RowSpan="2"
+                                FontFamily="{x:Bind FontFamily, Mode=OneWay}"
+                                FontSize="25"
+                                Glyph="{x:Bind Icon, Mode=OneWay}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                Text="{x:Bind Title, Mode=OneWay}" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Margin="10,0,0,0"
+                                Text="{x:Bind Description, Mode=OneWay}" />
+                        </Grid>
+                    </DataTemplate>
+                </AutoSuggestBox.ItemTemplate>
+            </AutoSuggestBox>
             <ui:TitleBar.Header>
                 <StackPanel Orientation="Horizontal">
                     <Button
@@ -92,7 +132,10 @@
             <NavigationView.MenuItems>
                 <NavigationViewItem Content="Modbus">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="Segoe UI Emoji" Glyph="&#x2603;" />
+                        <ImageIcon
+                            Width="10"
+                            Margin="2,0,0,0"
+                            Source="ms-appx:///Assets/Icons/modbus.png" />
                     </NavigationViewItem.Icon>
                     <NavigationViewItem.MenuItems>
                         <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.ModbusViewModels.ModbusSerialPortViewModel" Content="SerialPort">
@@ -120,14 +163,17 @@
                         </NavigationViewItem>
                         <NavigationViewItem Content="Qna3E Tcp">
                             <NavigationViewItem.MenuItems>
-                                <NavigationViewItem Content="Binary" IsEnabled="False" />
+                                <NavigationViewItem property:NavigationItemClickHelper.NavigationKey="CommunicationApp.ViewModels.MitsubishiViewModels.McNetQna3ETcpViewModel" Content="Binary" />
                                 <NavigationViewItem Content="ASCII" IsEnabled="False" />
                             </NavigationViewItem.MenuItems>
                         </NavigationViewItem>
                     </NavigationViewItem.MenuItems>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
-            <Frame x:Name="frame" />
+            <Grid>
+
+                <Frame x:Name="frame" />
+            </Grid>
         </NavigationView>
     </Grid>
 </Page>

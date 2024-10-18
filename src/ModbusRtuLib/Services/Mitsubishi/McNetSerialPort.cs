@@ -4,6 +4,7 @@ using System.IO.Ports;
 using ModbusRtuLib.Contracts.Mitsubishi;
 using ModbusRtuLib.Models;
 using ModbusRtuLib.Models.Handlers;
+using ModbusRtuLib.Services.Mitsubishi.Parse;
 
 namespace ModbusRtuLib.Services.Mitsubishi;
 
@@ -19,7 +20,7 @@ public partial class McNetSerialPort : IMcNetSerialPort
 
     public MitsubishiQna3EConnectChanged mitsubishiQna3EHandler;
 
-    public IMcNetAddressParse Parse => new McNetAddressParse();
+    public IMcNetAddressParse Parse => new McNetSerialPortAddressParse();
 
     public byte NetWorkId { get; set; } = 0x00;
 

@@ -1,13 +1,17 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using ModbusRtuLib.Contracts.Mitsubishi;
 using ModbusRtuLib.Models.Enums;
 
-namespace ModbusRtuLib.Services.Mitsubishi;
+namespace ModbusRtuLib.Services.Mitsubishi.Parse;
 
-public class McNetAddressParse : IMcNetAddressParse
+public class McNetTcpAddressParse : IMcNetAddressParse
 {
+    public byte[] GetLength(MitsubishiMCType type, ushort length)
+    {
+        var bytes = BitConverter.GetBytes(length);
+        return bytes;
+    }
+
     public MitsubishiMCType GetMcType(string address)
     {
         if (address.Length == 0)
@@ -57,15 +61,6 @@ public class McNetAddressParse : IMcNetAddressParse
         return MitsubishiMCType.None;
     }
 
-    public byte[] GetTimeSpan(int value)
-    {
-        var timeSpan = (byte)value / 10;
-        var header = BitConverter.GetBytes((short)timeSpan);
-        if (BitConverter.IsLittleEndian)
-            Array.Reverse(header);
-        return header;
-    }
-
     public byte[] GetStart(string address, int startSplit)
     {
         if (address.IndexOf(".") != -1)
@@ -75,9 +70,9 @@ public class McNetAddressParse : IMcNetAddressParse
             return new byte[0];
         }
         var result = address.Substring(startSplit);
-        var method = this.GetMcType(address);
+        var method = GetMcType(address);
         byte[] resultValue = null;
-        if (this.IsHexType(method) == true)
+        if (IsHexType(method) == true)
         {
             resultValue = BitConverter.GetBytes(Convert.ToUInt32(result, 16));
         }
@@ -86,21 +81,19 @@ public class McNetAddressParse : IMcNetAddressParse
             resultValue = BitConverter.GetBytes(int.Parse(result));
         }
         byte[] threeBytes = new byte[3];
-        Array.Copy(resultValue, 0, threeBytes, 0, 2); // 只取第1到第3个字节
+        Array.Copy(resultValue, 0, threeBytes, 0, 2);
         return threeBytes;
     }
 
-    public byte[] GetLength(MitsubishiMCType type, ushort length)
+    public byte[] GetTimeSpan(int value)
     {
-        var bytes = BitConverter.GetBytes(length);
-        return bytes;
+        var timeSpan = (byte)value / 10;
+        var header = BitConverter.GetBytes((short)timeSpan);
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(header);
+        return header;
     }
 
-    /// <summary>
-    /// 获取标识是否是位操作
-    /// </summary>
-    /// <param name="address"></param>
-    /// <returns></returns>
     public bool? IsWordType(string address)
     {
         if (address.Length == 0)
