@@ -5,7 +5,7 @@ using ModbusRtuLib.Models;
 namespace ModbusRtuLib.Contracts
 {
     /// <summary>
-    /// Tcp Socket
+    /// Socket Device
     /// </summary>
     public interface ISocketDevice
     {
@@ -25,6 +25,5 @@ namespace ModbusRtuLib.Contracts
         public Task SendDataAsync(string message);
 
         public Task<byte[]> SendDataAsync(byte[] message);
-        public TcpClient Client { get; }
     }
 }

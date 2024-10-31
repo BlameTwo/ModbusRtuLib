@@ -66,8 +66,7 @@ public class McNetTcpAddressParse : IMcNetAddressParse
         if (address.IndexOf(".") != -1)
         {
             var splitEnd = address.IndexOf(".");
-            //var result = address.Substring(startSplit, splitEnd);
-            return new byte[0];
+            var parse = address.Substring(startSplit, splitEnd);
         }
         var result = address.Substring(startSplit);
         var method = GetMcType(address);

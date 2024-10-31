@@ -192,6 +192,7 @@
                     Padding="4"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    Command="{x:Bind ViewModel.ClearCommand}"
                     Style="{ThemeResource TransparentButtonStyle}">
                     <FontIcon
                         FontFamily="Segoe Fluent Icons"

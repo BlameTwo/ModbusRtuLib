@@ -71,7 +71,8 @@ public class McNetSerialPortAddressParse : IMcNetAddressParse
         if (address.IndexOf(".") != -1)
         {
             var splitEnd = address.IndexOf(".");
-            //var result = address.Substring(startSplit, splitEnd);
+            var parse = address.Substring(startSplit, splitEnd - 1);
+            var length = address.Substring(splitEnd + 1);
             return new byte[0];
         }
         var result = address.Substring(startSplit);

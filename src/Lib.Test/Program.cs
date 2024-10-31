@@ -34,7 +34,5 @@ using ModbusRtuLib.Services.Mitsubishi;
 
 IMcNetTcp mctcp = new McNetTcp();
 var connect = await mctcp.OpenDeviceAsync("127.0.0.1");
-short value = 123;
-var result = await mctcp.WriteAsync(value, "D100");
-var result2 = await mctcp.ReadInt16Async("D100");
+var result = mctcp.ReadBit("D100.5");
 Console.ReadKey();

@@ -82,20 +82,94 @@ partial class McNetTcp
 
     public DataResult<bool> WriteBit(string address, bool value)
     {
-        byte byteVal = (byte)(value == true ? 0x10 : 0x00);
-        return this.Write(address, [byteVal], 0x01, true);
+        if (address.IndexOf('.') == -1)
+        {
+            byte byteVal = (byte)(value == true ? 0x10 : 0x00);
+            return this.Write(address, [byteVal], 0x01, true);
+        }
+        else
+        {
+            return WriteSignleBit(address, value);
+        }
+    }
+
+    public DataResult<bool> WriteSignleBit(string address, bool v)
+    {
+        var split = address.Split('.');
+        if (split.Length != 2)
+        {
+            return DataResult<bool>.NG("地址无法解析：.过多");
+        }
+        if (int.Parse(split[1]) >= 16)
+        {
+            return DataResult<bool>.NG("超出单个读取的16位限制！");
+        }
+        var result = this.ReadInt16(split[0]);
+        var value = SetBitAtPosition(result.Data, int.Parse(split[1]), v);
+        this.Write(value, split[0]);
+        return DataResult<bool>.OK(true);
+    }
+
+    public DataResult<bool> ReadSingleBit(string address)
+    {
+        var split = address.Split('.');
+        if (split.Length != 2)
+        {
+            return DataResult<bool>.NG("地址无法解析：.过多");
+        }
+        if (int.Parse(split[1]) >= 16)
+        {
+            return DataResult<bool>.NG("超出单个读取的16位限制！");
+        }
+        var result = this.ReadInt16(split[0]);
+        var value = GetBitAtPosition(result.Data, int.Parse(split[1]));
+        return DataResult<bool>.OK(value);
+    }
+
+    short SetBitAtPosition(short value, int index, bool boValue)
+    {
+        if (boValue)
+        {
+            short mask = (short)(1 << index);
+            short result = (short)(value | mask);
+            return result;
+        }
+        else
+        {
+            short mask = (short)~(1 << index);
+            short result = (short)(value & mask);
+
+            return result;
+        }
+    }
+
+    bool GetBitAtPosition(short value, int index)
+    {
+        short mask = (short)(1 << index);
+        return (value & mask) != 0;
     }
 
     public DataResult<bool> ReadBit(string address)
     {
-        var result = this.Read(address, 0x01);
-        byte[] data = new byte[result.ReceivedData.Length];
-        result.ReceivedData.CopyTo(data, 0);
-        if (CheckData(data, out var formatData, out var message))
+        if (address.IndexOf(".") == -1)
         {
-            return DataResult<bool>.OK(BitConverter.ToBoolean(formatData), result.OrginSend, data);
+            var result = this.Read(address, 0x01);
+            byte[] data = new byte[result.ReceivedData.Length];
+            result.ReceivedData.CopyTo(data, 0);
+            if (CheckData(data, out var formatData, out var message))
+            {
+                return DataResult<bool>.OK(
+                    BitConverter.ToBoolean(formatData),
+                    result.OrginSend,
+                    data
+                );
+            }
+            return DataResult<bool>.NG(message);
         }
-        return DataResult<bool>.NG(message);
+        else
+        {
+            return ReadSingleBit(address);
+        }
     }
 
     public DataResult<int> ReadInt32(string address)

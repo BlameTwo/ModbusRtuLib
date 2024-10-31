@@ -64,6 +64,12 @@ public sealed partial class McNetQna3ETcpViewModel : ObservableRecipient
         }
     }
 
+    [RelayCommand]
+    void Clear()
+    {
+        this.ModbusMessages.Clear();
+    }
+
     public void AddMessage<T>(DataResult<T> result)
     {
         ModbusMessages.Add(

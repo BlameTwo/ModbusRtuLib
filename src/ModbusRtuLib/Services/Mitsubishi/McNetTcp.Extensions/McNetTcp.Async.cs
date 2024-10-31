@@ -87,14 +87,58 @@ partial class McNetTcp
 
     public async Task<DataResult<bool>> ReadBitAsync(string address)
     {
-        var result = await this.ReadAsync(address, 0x01);
-        byte[] data = new byte[result.ReceivedData.Length];
-        result.ReceivedData.CopyTo(data, 0);
-        if (CheckData(data, out var formatData, out var message))
+        if (address.IndexOf(".") == -1)
         {
-            return DataResult<bool>.OK(BitConverter.ToBoolean(formatData), result.OrginSend, data);
+            var result = await this.ReadAsync(address, 0x01);
+            byte[] data = new byte[result.ReceivedData.Length];
+            result.ReceivedData.CopyTo(data, 0);
+            if (CheckData(data, out var formatData, out var message))
+            {
+                return DataResult<bool>.OK(
+                    BitConverter.ToBoolean(formatData),
+                    result.OrginSend,
+                    data
+                );
+            }
+            return DataResult<bool>.NG(message);
         }
-        return DataResult<bool>.NG(message);
+        else
+        {
+            return await ReadSingleBitAsync(address);
+        }
+    }
+
+    public async Task<DataResult<bool>> WriteSignleBitAsync(string address, bool v)
+    {
+        var split = address.Split('.');
+        if (split.Length != 2)
+        {
+            return DataResult<bool>.NG("地址无法解析：.过多");
+        }
+        if (int.Parse(split[1]) >= 16)
+        {
+            return DataResult<bool>.NG("超出单个读取的16位限制！");
+        }
+        var result = await this.ReadInt16Async(split[0]);
+        var value = SetBitAtPosition(result.Data, int.Parse(split[1]), v);
+        this.Write(value, split[0]);
+        return DataResult<bool>.OK(true);
+    }
+
+    public async Task<DataResult<bool>> ReadSingleBitAsync(string address)
+    {
+        var split = address.Split('.');
+        if (split.Length != 2)
+        {
+            return DataResult<bool>.NG("地址无法解析：.过多");
+        }
+        if (int.Parse(split[1]) >= 16)
+        {
+            return DataResult<bool>.NG("超出单个读取的16位限制！");
+        }
+        var result = await this.ReadInt16Async(split[0]);
+        var value = GetBitAtPosition(result.Data, int.Parse(split[1]));
+        return DataResult<bool>.OK(value);
     }
 
     public async Task<DataResult<double>> ReadDoubleAsync(string address)
@@ -184,7 +228,14 @@ partial class McNetTcp
 
     public Task<DataResult<bool>> WriteBitAsync(string address, bool value)
     {
-        byte byteVal = (byte)(value == true ? 0x10 : 0x00);
-        return this.WriteAsync(address, [byteVal], 0x01, true);
+        if (address.IndexOf(".") == -1)
+        {
+            byte byteVal = (byte)(value == true ? 0x10 : 0x00);
+            return this.WriteAsync(address, [byteVal], 0x01, true);
+        }
+        else
+        {
+            return this.WriteSignleBitAsync(address, value);
+        }
     }
 }

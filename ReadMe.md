@@ -22,9 +22,15 @@
     
     - [ ] SerialPort
       
-      - [x] ##### Bit
+      - [x] Bit
+      
+      - [ ] Ascii
     
     - [ ] Tcp
+      
+      - [x] Bit
+      
+      - [ ] Ascii
     
     - [ ] Udp
       

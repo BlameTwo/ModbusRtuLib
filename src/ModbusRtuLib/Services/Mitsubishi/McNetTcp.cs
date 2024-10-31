@@ -42,7 +42,7 @@ public partial class McNetTcp : IMcNetTcp
 
     public DataResult<bool> OpenDevice(string address, int port = 6000)
     {
-        Device = new SocketDevice();
+        Device = new TcpSocketDevice();
         var connnect = Device.Connect(address, port);
         this.IsConnected = connnect.Data;
         this.mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);
@@ -51,7 +51,7 @@ public partial class McNetTcp : IMcNetTcp
 
     public async Task<DataResult<bool>> OpenDeviceAsync(string address, int port = 6000)
     {
-        Device = new SocketDevice();
+        Device = new TcpSocketDevice();
         var connnect = await Device.ConnectAsync(address, port);
         this.IsConnected = connnect.Data;
         this.mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);

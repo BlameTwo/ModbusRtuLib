@@ -24,7 +24,7 @@ public class ModbusTcpClient : IModbusTcpClient
 
     public DataResult<bool> Connect(string host, int port = 502)
     {
-        Device = new SocketDevice();
+        Device = new TcpSocketDevice();
         var connect = Device.Connect(host, port);
         return connect;
     }

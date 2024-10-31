@@ -16,6 +16,7 @@ namespace ModbusRtuLib.Contracts.Mitsubishi
         public DataResult<bool> Write(float value, string address);
         DataResult<bool> ReadBit(string address);
         DataResult<bool> WriteBit(string address, bool value);
+        DataResult<bool> WriteSignleBit(string address, bool v);
         DataResult<bool> Write(int value, string address);
         DataResult<bool> Write(long value, string address);
         DataResult<bool> Write(short value, string address);
@@ -40,6 +41,10 @@ namespace ModbusRtuLib.Contracts.Mitsubishi
         Task<DataResult<short>> ReadInt16Async(string address);
         Task<DataResult<bool>> ReadBitAsync(string address);
         Task<DataResult<bool>> WriteBitAsync(string address, bool value);
+
+        Task<DataResult<bool>> WriteSignleBitAsync(string address, bool v);
+
+        Task<DataResult<bool>> ReadSingleBitAsync(string address);
         #endregion
         public byte[] DeviceCode { get; set; }
         byte NetWorkId { get; set; }
