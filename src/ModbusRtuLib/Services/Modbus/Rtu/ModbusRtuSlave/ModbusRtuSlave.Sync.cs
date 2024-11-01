@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ModbusRtuLib.Common;
 using ModbusRtuLib.Contracts.Modbus.Rtu;
 using ModbusRtuLib.Models;
+using ModbusRtuLib.Models.Enums;
 
 namespace ModbusRtuLib.Services.Rtu;
 
@@ -90,6 +91,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
             return new(value.Item1, result);
         }
         return new(null, null);
+    }
+
+    public (byte[], byte[]) ReadInputRegister(byte id, ushort start, ushort length)
+    {
+        var value = ReadData(id, 0x04, start, length);
+        byte[] result = new byte[length * 2];
+        Array.Copy(value.Item2, 3, result, 0, length * 2);
+        return (value.Item1, result);
     }
 
     (byte[], byte[]) ReadDiscrete(byte id, ushort start, ushort length)
@@ -255,7 +264,7 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<bool>.NG("发送错误，CRC校验失败");
     }
 
-    public DataResult<long> ReadInt64(ushort start)
+    public DataResult<long> ReadInt64(ushort start, ReadType readType = ReadType.HoldingRegister)
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, 4);
         var l = ByteConvert.BackLong(result.Item2, Config.DataFormat);
@@ -263,25 +272,49 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<long>.OK(result2, result.Item1, result.Item2);
     }
 
-    public DataResult<float> ReadFloat(ushort start)
+    public DataResult<float> ReadFloat(ushort start, ReadType readType = ReadType.HoldingRegister)
     {
-        var result = ReadHoldingRegister(Config.SlaveId, start, 2);
+        (byte[], byte[]) result = (new byte[0], new byte[0]);
+        if (readType == ReadType.HoldingRegister)
+        {
+            result = ReadHoldingRegister(Config.SlaveId, start, 2);
+        }
+        else
+        {
+            result = ReadInputRegister(Config.SlaveId, start, 2);
+        }
         var l = ByteConvert.BackFloat(result.Item2, Config.DataFormat);
         var result2 = BitConverter.ToSingle(l, 0);
         return DataResult<float>.OK(result2, result.Item1, result.Item2);
     }
 
-    public DataResult<short> ReadInt16(ushort start)
+    public DataResult<short> ReadInt16(ushort start, ReadType readType = ReadType.HoldingRegister)
     {
-        var result = ReadHoldingRegister(Config.SlaveId, start, 1);
+        (byte[], byte[]) result = (new byte[0], new byte[0]);
+        if (readType == ReadType.HoldingRegister)
+        {
+            result = ReadHoldingRegister(Config.SlaveId, start, 1);
+        }
+        else
+        {
+            result = ReadInputRegister(Config.SlaveId, start, 1);
+        }
         var l = ByteConvert.BackInt16(result.Item2, Config.DataFormat);
         var result2 = BitConverter.ToInt16(l, 0);
         return DataResult<short>.OK(result2, result.Item1, result.Item2);
     }
 
-    public DataResult<double> ReadDouble(ushort start)
+    public DataResult<double> ReadDouble(ushort start, ReadType readType = ReadType.HoldingRegister)
     {
-        var result = ReadHoldingRegister(Config.SlaveId, start, 4);
+        (byte[], byte[]) result = (new byte[0], new byte[0]);
+        if (readType == ReadType.HoldingRegister)
+        {
+            result = ReadHoldingRegister(Config.SlaveId, start, 4);
+        }
+        else
+        {
+            result = ReadInputRegister(Config.SlaveId, start, 4);
+        }
         var l = ByteConvert.BackDouble(result.Item2, Config.DataFormat);
         var result2 = BitConverter.ToDouble(l, 0);
         return DataResult<double>.OK(result2, result.Item1, result.Item2);
@@ -322,7 +355,11 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<bool>.NG("CRC校验失败");
     }
 
-    public DataResult<string> ReadString(ushort start, ushort length)
+    public DataResult<string> ReadString(
+        ushort start,
+        ushort length,
+        ReadType readType = ReadType.HoldingRegister
+    )
     {
         var result = ReadHoldingRegister(Config.SlaveId, start, length);
         var l = ByteConvert.ToStringWorld(result.Item2, Config.DataFormat);
@@ -330,7 +367,11 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<string>.OK(str, result.Item1, result.Item2);
     }
 
-    public DataResult<bool> WriteInt32(ushort start, int value)
+    public DataResult<bool> WriteInt32(
+        ushort start,
+        int value,
+        ReadType readType = ReadType.HoldingRegister
+    )
     {
         var byteValue = BitConverter.GetBytes(value);
         List<byte> data = new List<byte>();
@@ -355,11 +396,24 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         return DataResult<bool>.NG("发送错误，CRC校验失败");
     }
 
-    public DataResult<int> ReadInt32(ushort start)
+    public DataResult<int> ReadInt32(ushort start, ReadType readType = ReadType.HoldingRegister)
     {
-        var bytes = this.ReadHoldingRegister(this.Config.SlaveId, start, 0002);
+        (byte[], byte[]) bytes = (new byte[0], new byte[0]);
+        if (readType == ReadType.HoldingRegister)
+        {
+            bytes = ReadHoldingRegister(Config.SlaveId, start, 2);
+        }
+        else
+        {
+            bytes = ReadInputRegister(Config.SlaveId, start, 2);
+        }
         var floatByte = ByteConvert.BackInt32(bytes.Item2, Config.DataFormat);
         var f = BitConverter.ToInt32(floatByte, 0);
         return DataResult<int>.OK(f, bytes.Item1, bytes.Item2);
+    }
+
+    public DataResult<bool> WriteInt32(ushort start, int value)
+    {
+        throw new NotImplementedException();
     }
 }
