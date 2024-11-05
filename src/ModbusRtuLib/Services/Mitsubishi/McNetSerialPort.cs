@@ -10,15 +10,15 @@ namespace ModbusRtuLib.Services.Mitsubishi;
 
 public partial class McNetSerialPort : IMcNetSerialPort
 {
-    private bool disposedValue;
+    private bool _disposedValue;
 
     public event MitsubishiQna3EConnectChanged ConnectChanged
     {
-        add => mitsubishiQna3EHandler += value;
-        remove => mitsubishiQna3EHandler -= value;
+        add => _mitsubishiQna3EHandler += value;
+        remove => _mitsubishiQna3EHandler -= value;
     }
 
-    public MitsubishiQna3EConnectChanged mitsubishiQna3EHandler;
+    MitsubishiQna3EConnectChanged _mitsubishiQna3EHandler;
 
     public IMcNetAddressParse Parse => new McNetSerialPortAddressParse();
 
@@ -47,20 +47,20 @@ public partial class McNetSerialPort : IMcNetSerialPort
             if (Port.IsOpen)
             {
                 this.IsConnected = Port.IsOpen;
-                this.mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
+                this._mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
                 return DataResult<bool>.OK(true);
             }
             else
             {
                 this.IsConnected = Port.IsOpen;
-                this.mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
+                this._mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
                 return DataResult<bool>.NG("open error");
             }
         }
         catch (Exception ex)
         {
             this.IsConnected = Port.IsOpen;
-            this.mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
+            this._mitsubishiQna3EHandler?.Invoke(this, this.Port.IsOpen);
             return DataResult<bool>.NG(ex.Message);
         }
     }
@@ -70,12 +70,12 @@ public partial class McNetSerialPort : IMcNetSerialPort
     public void Close()
     {
         this.Port.Close();
-        this.mitsubishiQna3EHandler?.Invoke(this, false);
+        this._mitsubishiQna3EHandler?.Invoke(this, false);
     }
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
@@ -86,7 +86,7 @@ public partial class McNetSerialPort : IMcNetSerialPort
                 }
             }
 
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 

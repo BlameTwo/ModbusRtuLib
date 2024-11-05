@@ -124,14 +124,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.Add(method);
         data.AddRange(ByteConvert.GetStartBytes(start));
         data.AddRange(ByteConvert.GetStartBytes(length));
-        byte[] crc = CRC.Crc16(data.ToArray(), 6);
+        byte[] crc = Crc.Crc16(data.ToArray(), 6);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(Config.ReadTimeSpan);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, method, id, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, method, id, Config.IsCheckSlave);
         if (a)
         {
             return new(data.ToArray(), resultByte);
@@ -148,14 +148,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.Add((byte)(start % 256));
         data.Add((byte)(value ? 0xFF : 0x00));
         data.Add(0);
-        byte[] crc = CRC.Crc16(data.ToArray(), 6);
+        byte[] crc = Crc.Crc16(data.ToArray(), 6);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, 0x05, Config.SlaveId, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, 0x05, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
             return DataResult<bool>.OK(true, data.ToArray(), resultByte);
@@ -174,14 +174,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.Add(0x04);
         data.Add(8);
         data.AddRange(ByteConvert.ToDouble([value], Config.DataFormat));
-        byte[] crc = CRC.Crc16(data.ToArray(), 15);
+        byte[] crc = Crc.Crc16(data.ToArray(), 15);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
             return DataResult<bool>.OK(true, data.ToArray(), resultByte);
@@ -197,14 +197,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.Add((byte)(start / 256));
         data.Add((byte)(start % 256));
         data.AddRange(ByteConvert.ToInt16([value], Config.DataFormat));
-        byte[] crc = CRC.Crc16(data.ToArray(), 6);
+        byte[] crc = Crc.Crc16(data.ToArray(), 6);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, 0x06, Config.SlaveId, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, 0x06, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
             return DataResult<bool>.OK(true, data.ToArray(), resultByte);
@@ -223,14 +223,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.Add(0x02);
         data.Add(4);
         data.AddRange(ByteConvert.ToFloat([value], Config.DataFormat));
-        byte[] crc = CRC.Crc16(data.ToArray(), 11);
+        byte[] crc = Crc.Crc16(data.ToArray(), 11);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
             return DataResult<bool>.OK(true, data.ToArray(), resultByte);
@@ -249,14 +249,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.Add(0x04);
         data.Add(8);
         data.AddRange(ByteConvert.ToLong([value], Config.DataFormat));
-        byte[] crc = CRC.Crc16(data.ToArray(), 15);
+        byte[] crc = Crc.Crc16(data.ToArray(), 15);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
             return DataResult<bool>.OK(true, data.ToArray(), resultByte);
@@ -339,14 +339,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.AddRange(ByteConvert.GetLength(start));
         data.Add((byte)bytes.Length);
         data.AddRange(bytes);
-        byte[] crc = CRC.Crc16(data.ToArray(), data.Count);
+        byte[] crc = Crc.Crc16(data.ToArray(), data.Count);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
             return DataResult<bool>.OK(true);
@@ -381,14 +381,14 @@ public partial class ModbusRtuSlave : IModbusRtuSlave
         data.AddRange(ByteConvert.GetLength(0x0002));
         data.Add(4);
         data.AddRange(ByteConvert.ToInt32([value], Config.DataFormat));
-        byte[] crc = CRC.Crc16(data.ToArray(), 11);
+        byte[] crc = Crc.Crc16(data.ToArray(), 11);
         data.AddRange(crc);
         SerialPort.Write(data.ToArray(), 0, data.Count);
         Thread.Sleep(200);
         var count = SerialPort.BytesToRead;
         var resultByte = new byte[count];
         SerialPort.Read(resultByte, 0, count);
-        var a = CRC.CheckCRC(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
+        var a = Crc.CheckCrc(resultByte, 0x10, Config.SlaveId, Config.IsCheckSlave);
         if (a)
         {
             return DataResult<bool>.OK(true, data.ToArray(), resultByte);

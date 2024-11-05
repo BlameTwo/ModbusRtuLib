@@ -12,7 +12,7 @@ namespace ModbusRtuLib.Common;
 
 public class TcpSocketDevice : ISocketDevice
 {
-    private NetworkStream streamBase;
+    private NetworkStream streamBase = null;
 
     public bool IsReconnect { get; set; }
 

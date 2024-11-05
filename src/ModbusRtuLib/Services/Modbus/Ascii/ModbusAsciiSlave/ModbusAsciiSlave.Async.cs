@@ -58,7 +58,7 @@ namespace ModbusRtuLib.Services.Ascii
                 writeByte.Add(0x00);
                 resultString = await WriteDataAsync(0x05, start, 0x00, 0x00);
             }
-            if (LRC.CheckLRC(resultString))
+            if (Lrc.CheckLrc(resultString))
             {
                 if (resultString[1] == 0x05 && resultString[0] == Config.SlaveId)
                 {
@@ -79,7 +79,7 @@ namespace ModbusRtuLib.Services.Ascii
         {
             var resultString = await ReadDatasAsync(start, 0x01, start);
 
-            if (LRC.CheckLRC(resultString))
+            if (Lrc.CheckLrc(resultString))
             {
                 if (resultString[0] == 0x01)
                 {
@@ -100,7 +100,7 @@ namespace ModbusRtuLib.Services.Ascii
         public async Task<DataResult<bool>> ReadiscreteAsync(ushort start)
         {
             var resultString = await ReadDatasAsync(start, 0x02, start);
-            if (LRC.CheckLRC(resultString))
+            if (Lrc.CheckLrc(resultString))
             {
                 if (resultString.Length != 4)
                 {
@@ -202,7 +202,7 @@ namespace ModbusRtuLib.Services.Ascii
             writeByte.AddRange(ByteConvert.GetLength((ushort)(data.Length / 2)));
             writeByte.Add((byte)data.Length);
             writeByte.AddRange(data);
-            var lrc = LRC.LRCCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
+            var lrc = Lrc.LrcCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
             writeByte.Add(lrc);
             List<string> sendValue = new List<string>();
             foreach (var item in writeByte)

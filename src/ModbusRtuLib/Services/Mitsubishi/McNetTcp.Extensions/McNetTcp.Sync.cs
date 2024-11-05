@@ -8,11 +8,11 @@ namespace ModbusRtuLib.Services.Mitsubishi;
 
 partial class McNetTcp
 {
-    public List<byte> GetHeader() => [0x50, 0x00, NetWorkId, 0xFF, .. DeviceCode, NetWorkSlave];
+    private List<byte> GetHeader() => [0x50, 0x00, NetWorkId, 0xFF, .. DeviceCode, NetWorkSlave];
 
-    public DataResult<bool> Write(string address, byte[] data, ushort length, bool isBit = false)
+    private DataResult<bool> Write(string address, byte[] data, ushort length, bool isBit = false)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         if (!isBit)
@@ -36,9 +36,9 @@ partial class McNetTcp
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
         dataBytes.AddRange(data);
-        Resultbytes.Add((byte)(dataBytes.Count - 1));
-        Resultbytes.AddRange(dataBytes);
-        var resultByte = this.Device.SendData(Resultbytes.ToArray());
+        resultbytes.Add((byte)(dataBytes.Count - 1));
+        resultbytes.AddRange(dataBytes);
+        var resultByte = this.Device.SendData(resultbytes.ToArray());
 
         if (
             resultByte[0] == 0xD0
@@ -47,14 +47,14 @@ partial class McNetTcp
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<bool>.OK(true, Resultbytes.ToArray(), resultByte);
+            return DataResult<bool>.OK(true, resultbytes.ToArray(), resultByte);
         }
         return DataResult<bool>.NG("写入失败！");
     }
 
     public DataResult<byte[]> Read(string address, ushort length)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         var method = Parse.GetMcType(address);
@@ -64,9 +64,9 @@ partial class McNetTcp
         dataBytes.AddRange(Parse.GetStart(address, 1));
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
-        Resultbytes.Add((byte)(dataBytes.Count - 1));
-        Resultbytes.AddRange(dataBytes);
-        var resultByte = this.Device.SendData(Resultbytes.ToArray());
+        resultbytes.Add((byte)(dataBytes.Count - 1));
+        resultbytes.AddRange(dataBytes);
+        var resultByte = this.Device.SendData(resultbytes.ToArray());
         Thread.Sleep(TimeSpan);
         if (
             resultByte[0] == 0xD0
@@ -75,7 +75,7 @@ partial class McNetTcp
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<byte[]>.OK(resultByte, Resultbytes.ToArray(), resultByte);
+            return DataResult<byte[]>.OK(resultByte, resultbytes.ToArray(), resultByte);
         }
         return DataResult<byte[]>.NG("写入失败！");
     }
@@ -151,7 +151,7 @@ partial class McNetTcp
 
     public DataResult<bool> ReadBit(string address)
     {
-        if (address.IndexOf(".") == -1)
+        if (address.IndexOf(".", StringComparison.Ordinal) == -1)
         {
             var result = this.Read(address, 0x01);
             byte[] data = new byte[result.ReceivedData.Length];
@@ -249,9 +249,9 @@ partial class McNetTcp
         byte[] length = new byte[2];
         Array.Copy(data, 6, length, 0, 2);
         Array.Reverse(length);
-        var Spiltlength = BitConverter.ToInt16(length, 0);
-        byte[] resultData = new byte[Spiltlength];
-        Array.Copy(data, 7 + 2, resultData, 0, Spiltlength);
+        var spiltlength = BitConverter.ToInt16(length, 0);
+        byte[] resultData = new byte[spiltlength];
+        Array.Copy(data, 7 + 2, resultData, 0, spiltlength);
         var d = resultData.Skip(2).ToArray();
         dataResult = d;
         messageData = "无错误";

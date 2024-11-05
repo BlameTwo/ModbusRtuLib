@@ -9,9 +9,9 @@ namespace ModbusRtuLib.Services.Mitsubishi;
 
 public partial class McNetSerialPort
 {
-    public DataResult<bool> Write(string address, byte[] data, ushort length)
+    private DataResult<bool> Write(string address, byte[] data, ushort length)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         if (length >= 1)
@@ -35,9 +35,9 @@ public partial class McNetSerialPort
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
         dataBytes.AddRange(data);
-        Resultbytes.Add((byte)dataBytes.Count);
-        Resultbytes.AddRange(dataBytes);
-        this.Port.Write(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        resultbytes.Add((byte)dataBytes.Count);
+        resultbytes.AddRange(dataBytes);
+        this.Port.Write(resultbytes.ToArray(), 0, resultbytes.Count);
         Thread.Sleep(TimeSpan);
         var count = Port.BytesToRead;
         var resultByte = new byte[count];
@@ -49,14 +49,14 @@ public partial class McNetSerialPort
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<bool>.OK(true, Resultbytes.ToArray(), resultByte);
+            return DataResult<bool>.OK(true, resultbytes.ToArray(), resultByte);
         }
         return DataResult<bool>.NG("写入失败！");
     }
 
     public DataResult<bool> ReadBit(string address)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         List<byte> addBytes = new List<byte>();
         addBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         addBytes.AddRange([0x00, 0x01, 0x04, 0x01]);
@@ -65,9 +65,9 @@ public partial class McNetSerialPort
         var method = Parse.GetMcType(address);
         addBytes.Add((byte)method);
         addBytes.AddRange(Parse.GetLength(method, 1));
-        Resultbytes.Add((byte)addBytes.Count);
-        Resultbytes.AddRange(addBytes);
-        this.Port.Write(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        resultbytes.Add((byte)addBytes.Count);
+        resultbytes.AddRange(addBytes);
+        this.Port.Write(resultbytes.ToArray(), 0, resultbytes.Count);
         Thread.Sleep(TimeSpan);
         var count = Port.BytesToRead;
         var resultByte = new byte[count];
@@ -80,7 +80,7 @@ public partial class McNetSerialPort
         )
         {
             var result = BitConverter.ToBoolean(resultByte, resultByte.Length - 1);
-            return DataResult<bool>.OK(result, Resultbytes.ToArray(), resultByte);
+            return DataResult<bool>.OK(result, resultbytes.ToArray(), resultByte);
         }
         return DataResult<bool>.NG("读取校验失败！");
     }
@@ -116,9 +116,9 @@ public partial class McNetSerialPort
         return this.Write(address, BitConverter.GetBytes(value), 1);
     }
 
-    public DataResult<byte[]> Read(string address, ushort length)
+    private DataResult<byte[]> Read(string address, ushort length)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         var method = Parse.GetMcType(address);
@@ -134,9 +134,9 @@ public partial class McNetSerialPort
         dataBytes.AddRange(Parse.GetStart(address, 1));
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
-        Resultbytes.Add((byte)dataBytes.Count);
-        Resultbytes.AddRange(dataBytes);
-        this.Port.Write(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        resultbytes.Add((byte)dataBytes.Count);
+        resultbytes.AddRange(dataBytes);
+        this.Port.Write(resultbytes.ToArray(), 0, resultbytes.Count);
         Thread.Sleep(TimeSpan);
         var count = Port.BytesToRead;
         var resultByte = new byte[count];
@@ -148,7 +148,7 @@ public partial class McNetSerialPort
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<byte[]>.OK(resultByte, Resultbytes.ToArray(), resultByte);
+            return DataResult<byte[]>.OK(resultByte, resultbytes.ToArray(), resultByte);
         }
         return DataResult<byte[]>.NG("写入失败！");
     }

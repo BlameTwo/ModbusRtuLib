@@ -8,14 +8,14 @@ namespace ModbusRtuLib.Services.Mitsubishi;
 
 public partial class McNetSerialPort
 {
-    public async Task<DataResult<bool>> WriteAsync(
+    private async Task<DataResult<bool>> WriteAsync(
         string address,
         byte[] data,
         ushort length,
         bool isBit = false
     )
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         var method = Parse.GetMcType(address);
@@ -44,13 +44,13 @@ public partial class McNetSerialPort
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
         dataBytes.AddRange(data);
-        Resultbytes.Add((byte)dataBytes.Count);
-        Resultbytes.AddRange(dataBytes);
-        await this.Port.BaseStream.WriteAsync(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        resultbytes.Add((byte)dataBytes.Count);
+        resultbytes.AddRange(dataBytes);
+        await this.Port.BaseStream.WriteAsync(resultbytes.ToArray(), 0, resultbytes.Count);
         Thread.Sleep(TimeSpan);
         var count = Port.BytesToRead;
         var resultByte = new byte[count];
-        await Port.BaseStream.ReadAsync(resultByte, 0, count);
+        _ = await Port.BaseStream.ReadAsync(resultByte, 0, count);
         if (
             resultByte[0] == 0xD0
             && resultByte[2] == this.NetWorkId
@@ -58,14 +58,14 @@ public partial class McNetSerialPort
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<bool>.OK(true, Resultbytes.ToArray(), resultByte);
+            return DataResult<bool>.OK(true, resultbytes.ToArray(), resultByte);
         }
         return DataResult<bool>.NG("写入失败！");
     }
 
     public async Task<DataResult<byte[]>> ReadAsync(string address, ushort length)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         var method = Parse.GetMcType(address);
@@ -75,9 +75,9 @@ public partial class McNetSerialPort
         dataBytes.AddRange(Parse.GetStart(address, 1));
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
-        Resultbytes.Add((byte)dataBytes.Count);
-        Resultbytes.AddRange(dataBytes);
-        await this.Port.BaseStream.WriteAsync(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        resultbytes.Add((byte)dataBytes.Count);
+        resultbytes.AddRange(dataBytes);
+        await this.Port.BaseStream.WriteAsync(resultbytes.ToArray(), 0, resultbytes.Count);
         Thread.Sleep(TimeSpan);
         var count = Port.BytesToRead;
         var resultByte = new byte[count];
@@ -89,7 +89,7 @@ public partial class McNetSerialPort
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<byte[]>.OK(resultByte, Resultbytes.ToArray(), resultByte);
+            return DataResult<byte[]>.OK(resultByte, resultbytes.ToArray(), resultByte);
         }
         return DataResult<byte[]>.NG("写入失败！");
     }
@@ -133,7 +133,7 @@ public partial class McNetSerialPort
 
     public async Task<DataResult<bool>> ReadBitAsync(string address)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         List<byte> addBytes = new List<byte>();
         addBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         addBytes.AddRange([0x00, 0x01, 0x04, 0x01]);
@@ -142,13 +142,13 @@ public partial class McNetSerialPort
         var method = Parse.GetMcType(address);
         addBytes.Add((byte)method);
         addBytes.AddRange(Parse.GetLength(method, 1));
-        Resultbytes.Add((byte)addBytes.Count);
-        Resultbytes.AddRange(addBytes);
-        await this.Port.BaseStream.WriteAsync(Resultbytes.ToArray(), 0, Resultbytes.Count);
+        resultbytes.Add((byte)addBytes.Count);
+        resultbytes.AddRange(addBytes);
+        await this.Port.BaseStream.WriteAsync(resultbytes.ToArray(), 0, resultbytes.Count);
         Thread.Sleep(TimeSpan);
         var count = Port.BytesToRead;
         var resultByte = new byte[count];
-        await Port.BaseStream.ReadAsync(resultByte, 0, count);
+        _ = await Port.BaseStream.ReadAsync(resultByte, 0, count);
         if (
             resultByte[0] == 0xD0
             && resultByte[2] == this.NetWorkId
@@ -157,7 +157,7 @@ public partial class McNetSerialPort
         )
         {
             var result = BitConverter.ToBoolean(resultByte, resultByte.Length - 1);
-            return DataResult<bool>.OK(result, Resultbytes.ToArray(), resultByte);
+            return DataResult<bool>.OK(result, resultbytes.ToArray(), resultByte);
         }
         return DataResult<bool>.NG("读取校验失败！");
     }

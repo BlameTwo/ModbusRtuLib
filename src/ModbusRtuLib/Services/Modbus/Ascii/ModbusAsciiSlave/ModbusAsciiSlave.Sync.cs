@@ -174,7 +174,7 @@ partial class ModbusAsciiSlave
     {
         var resultString = ReadDatas(start, 0x01, 0x0001);
 
-        if (LRC.CheckLRC(resultString))
+        if (Lrc.CheckLrc(resultString))
         {
             if (resultString[0] == 0x01)
             {
@@ -200,7 +200,7 @@ partial class ModbusAsciiSlave
         strings.Add(method);
         strings.AddRange(ByteConvert.GetStartBytes(start));
         strings.AddRange(ByteConvert.GetLength(length));
-        var lrc = LRC.LRCCalc(strings.ToArray(), 1, 6);
+        var lrc = Lrc.LrcCalc(strings.ToArray(), 1, 6);
         strings.Add(lrc);
         List<string> sendValue = new List<string>();
         foreach (var item in strings)
@@ -274,7 +274,7 @@ partial class ModbusAsciiSlave
             writeByte.Add(0x00);
             resultString = WriteData(0x05, start, 0x00, 0x00);
         }
-        if (LRC.CheckLRC(resultString))
+        if (Lrc.CheckLrc(resultString))
         {
             if (resultString[1] == 0x05 && resultString[0] == Config.SlaveId)
             {
@@ -302,7 +302,7 @@ partial class ModbusAsciiSlave
         {
             writeByte.Add(item);
         }
-        var lrc = LRC.LRCCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
+        var lrc = Lrc.LrcCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
         writeByte.Add(lrc);
         List<string> sendValue = new List<string>();
         foreach (var item in writeByte)
@@ -338,7 +338,7 @@ partial class ModbusAsciiSlave
         writeByte.AddRange(ByteConvert.GetLength((ushort)(data.Length / 2)));
         writeByte.Add((byte)data.Length);
         writeByte.AddRange(data);
-        var lrc = LRC.LRCCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
+        var lrc = Lrc.LrcCalc(writeByte.ToArray(), 1, writeByte.Count - 1);
         writeByte.Add(lrc);
         List<string> sendValue = new List<string>();
         foreach (var item in writeByte)
@@ -367,7 +367,7 @@ partial class ModbusAsciiSlave
     public DataResult<bool> ReadDiscrete(ushort start)
     {
         var resultString = ReadDatas(start, 0x02, start);
-        if (LRC.CheckLRC(resultString))
+        if (Lrc.CheckLrc(resultString))
         {
             if (resultString.Length != 4)
             {

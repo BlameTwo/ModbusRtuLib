@@ -63,22 +63,15 @@ public class McNetTcpAddressParse : IMcNetAddressParse
 
     public byte[] GetStart(string address, int startSplit)
     {
-        if (address.IndexOf(".") != -1)
+        if (address.IndexOf(".", StringComparison.Ordinal) != -1)
         {
-            var splitEnd = address.IndexOf(".");
+            var splitEnd = address.IndexOf(".", StringComparison.Ordinal);
             var parse = address.Substring(startSplit, splitEnd);
         }
         var result = address.Substring(startSplit);
         var method = GetMcType(address);
         byte[] resultValue = null;
-        if (IsHexType(method) == true)
-        {
-            resultValue = BitConverter.GetBytes(Convert.ToUInt32(result, 16));
-        }
-        else
-        {
-            resultValue = BitConverter.GetBytes(int.Parse(result));
-        }
+        resultValue = IsHexType(method) == true ? BitConverter.GetBytes(Convert.ToUInt32(result, 16)) : BitConverter.GetBytes(int.Parse(result));
         byte[] threeBytes = new byte[3];
         Array.Copy(resultValue, 0, threeBytes, 0, 2);
         return threeBytes;

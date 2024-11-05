@@ -10,14 +10,14 @@ namespace ModbusRtuLib.Services.Mitsubishi;
 
 partial class McNetTcp
 {
-    public async Task<DataResult<bool>> WriteAsync(
+    private async Task<DataResult<bool>> WriteAsync(
         string address,
         byte[] data,
         ushort length,
         bool isBit = false
     )
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         if (!isBit)
@@ -41,9 +41,9 @@ partial class McNetTcp
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
         dataBytes.AddRange(data);
-        Resultbytes.Add((byte)(dataBytes.Count - 1));
-        Resultbytes.AddRange(dataBytes);
-        var resultByte = await this.Device.SendDataAsync(Resultbytes.ToArray());
+        resultbytes.Add((byte)(dataBytes.Count - 1));
+        resultbytes.AddRange(dataBytes);
+        var resultByte = await this.Device.SendDataAsync(resultbytes.ToArray());
 
         if (
             resultByte[0] == 0xD0
@@ -52,14 +52,14 @@ partial class McNetTcp
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<bool>.OK(true, Resultbytes.ToArray(), resultByte);
+            return DataResult<bool>.OK(true, resultbytes.ToArray(), resultByte);
         }
         return DataResult<bool>.NG("写入失败！");
     }
 
     public async Task<DataResult<byte[]>> ReadAsync(string address, ushort length)
     {
-        List<byte> Resultbytes = GetHeader();
+        List<byte> resultbytes = GetHeader();
         var dataBytes = new List<byte>();
         dataBytes.AddRange(Parse.GetTimeSpan(this.TimeSpan));
         var method = Parse.GetMcType(address);
@@ -69,9 +69,9 @@ partial class McNetTcp
         dataBytes.AddRange(Parse.GetStart(address, 1));
         dataBytes.Add((byte)method);
         dataBytes.AddRange(Parse.GetLength(method, length));
-        Resultbytes.Add((byte)(dataBytes.Count - 1));
-        Resultbytes.AddRange(dataBytes);
-        var resultByte = await this.Device.SendDataAsync(Resultbytes.ToArray());
+        resultbytes.Add((byte)(dataBytes.Count - 1));
+        resultbytes.AddRange(dataBytes);
+        var resultByte = await this.Device.SendDataAsync(resultbytes.ToArray());
         Thread.Sleep(TimeSpan);
         if (
             resultByte[0] == 0xD0
@@ -80,14 +80,14 @@ partial class McNetTcp
             && resultByte[5] == DeviceCode[1]
         )
         {
-            return DataResult<byte[]>.OK(resultByte, Resultbytes.ToArray(), resultByte);
+            return DataResult<byte[]>.OK(resultByte, resultbytes.ToArray(), resultByte);
         }
         return DataResult<byte[]>.NG("写入失败！");
     }
 
     public async Task<DataResult<bool>> ReadBitAsync(string address)
     {
-        if (address.IndexOf(".") == -1)
+        if (address.IndexOf(".", StringComparison.Ordinal) == -1)
         {
             var result = await this.ReadAsync(address, 0x01);
             byte[] data = new byte[result.ReceivedData.Length];
@@ -228,7 +228,7 @@ partial class McNetTcp
 
     public Task<DataResult<bool>> WriteBitAsync(string address, bool value)
     {
-        if (address.IndexOf(".") == -1)
+        if (address.IndexOf(".", StringComparison.Ordinal) == -1)
         {
             byte byteVal = (byte)(value == true ? 0x10 : 0x00);
             return this.WriteAsync(address, [byteVal], 0x01, true);

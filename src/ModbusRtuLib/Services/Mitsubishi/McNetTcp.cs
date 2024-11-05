@@ -24,18 +24,18 @@ public partial class McNetTcp : IMcNetTcp
 
     public event MitsubishiQna3EConnectChanged ConnectChanged
     {
-        add => mitsubishiQna3EConnectChanged += value;
-        remove => mitsubishiQna3EConnectChanged -= value;
+        add => _mitsubishiQna3EConnectChanged += value;
+        remove => _mitsubishiQna3EConnectChanged -= value;
     }
 
-    public MitsubishiQna3EConnectChanged mitsubishiQna3EConnectChanged;
+    MitsubishiQna3EConnectChanged _mitsubishiQna3EConnectChanged;
 
     public void Close()
     {
         if (Device != null)
         {
             Device.IsReconnect = false;
-            this.mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);
+            this._mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);
             Device.Disconnect();
         }
     }
@@ -45,7 +45,7 @@ public partial class McNetTcp : IMcNetTcp
         Device = new TcpSocketDevice();
         var connnect = Device.Connect(address, port);
         this.IsConnected = connnect.Data;
-        this.mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);
+        this._mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);
         return DataResult<bool>.OK(this.IsConnected);
     }
 
@@ -54,7 +54,7 @@ public partial class McNetTcp : IMcNetTcp
         Device = new TcpSocketDevice();
         var connnect = await Device.ConnectAsync(address, port);
         this.IsConnected = connnect.Data;
-        this.mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);
+        this._mitsubishiQna3EConnectChanged?.Invoke(this, IsConnected);
         return DataResult<bool>.OK(true);
     }
 }

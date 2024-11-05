@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ModbusRtuLib.Common
 {
-    public static class CRC
+    public static class Crc
     {
         #region  CRC校验
-        private static readonly byte[] aucCRCHi =
+        private static readonly byte[] AucCrcHi =
         {
             0x00,
             0xC1,
@@ -529,7 +529,7 @@ namespace ModbusRtuLib.Common
             0x40,
         };
 
-        static CRC() { }
+        static Crc() { }
 
         public static byte[] Crc16(byte[] pucFrame, int usLen)
         {
@@ -541,7 +541,7 @@ namespace ModbusRtuLib.Common
             while (usLen-- > 0)
             {
                 iIndex = (UInt16)(crcLo ^ pucFrame[i++]);
-                crcLo = (byte)(crcHi ^ aucCRCHi[iIndex]);
+                crcLo = (byte)(crcHi ^ AucCrcHi[iIndex]);
                 crcHi = aucCRCLo[iIndex];
             }
 
@@ -551,7 +551,7 @@ namespace ModbusRtuLib.Common
         #endregion
 
 
-        public static List<byte> CRC16RetFullByte(
+        public static List<byte> Crc16RetFullByte(
             List<byte> value,
             ushort poly = 0xA001,
             ushort crcInit = 0xFFFF
@@ -584,7 +584,7 @@ namespace ModbusRtuLib.Common
             return buffer;
         }
 
-        public static bool CheckCRC(byte[] data, byte method, byte slave, bool check)
+        public static bool CheckCrc(byte[] data, byte method, byte slave, bool check)
         {
             if (data == null)
                 return false;
@@ -598,7 +598,7 @@ namespace ModbusRtuLib.Common
             }
             if (method != data[1])
                 return false;
-            if (crc[0] == data[data.Length - 2] && crc[1] == data[data.Length - 1])
+            if (crc[0] == data[^2] && crc[1] == data[^1])
             {
                 return true;
             }
